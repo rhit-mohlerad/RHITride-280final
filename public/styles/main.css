@@ -7,6 +7,14 @@ body {
     color: white;
 }
 
+.nav-link {
+    color: white;
+}
+
+.desktop-button {
+    display: none;
+}
+
 .page-container {
     margin-top: 75px;
 }
@@ -72,3 +80,11 @@ button > i {
     margin-right: 10px;
 }
 
+@media (min-width: 768px) {
+    .bottom-nav {
+        display: none;
+    }
+    .desktop-button {
+        display: block;
+    }
+}
