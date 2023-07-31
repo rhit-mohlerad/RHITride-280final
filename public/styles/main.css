@@ -8,6 +8,22 @@ body {
     padding-bottom: 0;
 }
 
+.bottom-nav {
+    padding-top: 2px;
+}
+
+.bottom-nav a {
+    font-size: 0.8em;
+    padding-top: 0;
+}
+.bottom-nav i {
+    font-size: 2.5em;
+}
+
+.bottom-nav > .nav-link {
+    padding-bottom: 2px;
+}
+
 .nav-link {
     color: white;
     display: block;
@@ -24,6 +40,11 @@ body {
 
 .desktop-button {
     display: none;
+}
+
+.material-icons {
+    vertical-align: text-bottom;
+    margin-right: 4px;
 }
 
 .page-container {
