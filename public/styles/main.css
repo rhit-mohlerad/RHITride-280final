@@ -55,3 +55,19 @@ body {
     font-size: 2.25em;
     color: green;
 }
+
+#mainPage > button {
+    border-radius: 10px;
+    background-color: white;
+    color: #800000;
+    border: 1px #800000 solid;
+    display: block;
+    padding: 15px 40px;
+    width: 50%;
+    margin-bottom: 10px;
+    font-size: 1em;
+}
+
+button > i {
+    margin-right: 10px;
+}
