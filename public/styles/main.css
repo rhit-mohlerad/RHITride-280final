@@ -5,13 +5,21 @@ body {
 .navbar {
     background-color: #800000;
     color: white;
+    padding-bottom: 0;
 }
 
 .nav-link {
     color: white;
     display: block;
     text-align: center;
-    align-items: center;
+}
+
+.active {
+    border-bottom: 5px white solid;
+}
+
+.nav-link.active:hover {
+    color: white;
 }
 
 .desktop-button {
