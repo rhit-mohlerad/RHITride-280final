@@ -9,6 +9,9 @@ body {
 
 .nav-link {
     color: white;
+    display: block;
+    text-align: center;
+    align-items: center;
 }
 
 .desktop-button {
