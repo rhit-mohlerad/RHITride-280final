@@ -7,21 +7,47 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Material+Icons">
   <link rel="stylesheet" href="styles/bootstrap-material-design.min.css">
   <link rel="stylesheet" href="styles/main.css">
-  <title>App Name</title>
+  <title>RHITride</title>
 </head>
 
 <body>
   <nav class="navbar navbar-dark fixed-top">
-    <a class="navbar-brand" href="#">App Name</a>
+    <a class="navbar-brand" href="#">RHITride</a>
   </nav>
   <div id="mainPage" class="container page-container">
 
-
+    <div class="card">
+      <div class="card-body">
+        <div class="align-items-center row">
+          <img src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png"
+            alt="Profile Picture" class="card-pfp">
+          <h6 class="text-muted card-username">John Doe's Ride</h6>
+          <div class="card-seats-available">1 seat available</div>
+        </div>
+        <div class="card-locations">
+          <h6 class="text-muted card-from">From: Walmart Supercenter</h6>
+          <h6 class="text-muted card-to">To: Culver's</h6>
+        </div>
+        <div class="bottom-row row">
+          <div class="card-times">
+            <h6 class="text-muted card-departure">Departure Time: 2:45pm</h6>
+            <h6 class="text-muted card-return">Return Time: 3:00pm</h6>
+          </div>
+          <div class="card-money row align-items-center">
+            <div class="">Price&nbsp;</div>
+            <div class="card-value">$10</div>
+          </div>
+        </div>
+       
+      </div>
+    </div>
   </div>
   <script src="scripts/jquery.min.js"></script>
   <script src="scripts/popper.js"></script>
   <script src="scripts/bootstrap-material-design.js"></script>
-  <script>$("body").bootstrapMaterialDesign();</script>
+  <script>
+    $("body").bootstrapMaterialDesign();
+  </script>
   <script src="/__/firebase/7.18.0/firebase-app.js"></script>
   <script src="/__/firebase/7.18.0/firebase-analytics.js"></script>
   <script src="/__/firebase/7.18.0/firebase-auth.js"></script>
