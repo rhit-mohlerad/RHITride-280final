@@ -112,6 +112,22 @@ button > i {
     margin-right: 10px;
 }
 
+#rosefireButton {
+    display: block;
+    margin: 60px auto;
+    color: white;
+    background: #800000;
+    font-size: 1.1em;
+    padding: 10px 30px;
+    border-radius: 5px;
+}
+
+#roseLogo {
+    max-width: 350px;
+    display: block;
+    margin: 20px auto;
+}
+
 @media (min-width: 768px) {
     .bottom-nav {
         display: none;
