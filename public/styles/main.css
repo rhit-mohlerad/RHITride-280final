@@ -87,6 +87,11 @@ body {
     margin-top: -27px;
 }
 
+/* Delete second-post hardcoded different background color */
+#second-post {
+    background-color: lightblue;
+}
+
 .card-locations {
     margin-top: -10px;
 }
