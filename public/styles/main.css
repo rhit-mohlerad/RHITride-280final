@@ -78,7 +78,7 @@ body {
     margin-top: -10px;
 }
 
-.card-seats-available {
+.card-seats-available, .ride-type{
     margin-left: auto;
     background-color: rgba(216, 2, 2, 0.361);
     padding: 3px;
@@ -109,6 +109,7 @@ body {
     padding-bottom: 5px;
     border-radius: 7px;
     margin-left: 12px;
+    min-height: auto;
 }
 
 .card-money {
@@ -152,6 +153,15 @@ button > i {
     max-width: 350px;
     display: block;
     margin: 20px auto;
+}
+
+.ride-type {
+    background-color: lightblue;
+}
+
+.pay-text {
+    font-size: 1.5em;
+    font-weight: 500;
 }
 
 @media (min-width: 768px) {
