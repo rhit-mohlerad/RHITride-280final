@@ -51,6 +51,19 @@ body {
     margin-top: 75px;
 }
 
+#available-rides-text {
+    font-size: 1.5em;
+    margin-top: 40px;
+    font-weight: 600;
+    color: gray;
+}
+
+.card {
+    border-radius: 10px;
+    border: 1px solid gray;
+    margin-bottom: 20px;
+}
+
 .card-pfp {
     width: 40px;
     border-radius: 100%;
@@ -58,10 +71,11 @@ body {
 }
 
 .card-username {
-    margin-left: 5px;
+    margin-left: 10px;
     font-size: 1.5em;
     font-weight: 600;
     margin-bottom: 0;
+    margin-top: -10px;
 }
 
 .card-seats-available {
@@ -70,19 +84,26 @@ body {
     padding: 3px;
     border-radius: 5px;
     margin-right: 5px;
+    margin-top: -27px;
+}
+
+.card-locations {
+    margin-top: -10px;
 }
 
 .card-locations h6 {
     font-size: 1.1em;
-    margin-left: 40px;
+    margin-left: 45px;
     margin-bottom: 3px;
 }
 
 .card-times {
     background-color: rgba(128, 128, 128, 0.217);
     width: 200px;
-    padding: 5px;
+    padding: 10px;
+    padding-bottom: 5px;
     border-radius: 7px;
+    margin-left: 12px;
 }
 
 .card-money {
