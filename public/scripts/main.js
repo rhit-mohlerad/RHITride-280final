@@ -35,6 +35,14 @@ rhit.LoginPageController = class {
 	}
 }
 
+rhit.ProfilePageController = class {
+	constructor() {
+		document.querySelector("#signOutButton").onclick = (event) => {
+			rhit.fbAuthManager.signOut();
+		}
+	}
+}
+
 rhit.FbAuthManager = class {
 	constructor() {
 		this._user = null;
@@ -83,6 +91,10 @@ rhit.initializePage = function () {
 	if (document.querySelector("#loginPage")) {
 		console.log("login page");
 		new rhit.LoginPageController();
+	}
+	if (document.querySelector("#profilePage")) {
+		console.log("profile page");
+		new rhit.ProfilePageController();
 	}
 };
 

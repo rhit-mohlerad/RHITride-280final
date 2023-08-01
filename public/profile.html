@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Material+Icons">
+  <link rel="stylesheet" href="styles/bootstrap-material-design.min.css">
+  <link rel="stylesheet" href="styles/main.css">
+  <title>RHITride</title>
+</head>
+
+<body>
+  <nav class="navbar navbar-dark fixed-top">
+    <a class="navbar-brand" href="/home.html">RHITride Profile</a>
+    <a class="nav-link desktop-button" href="/home.html"><i class="material-icons">home</i>Home</a>
+    <a class="nav-link desktop-button" href="/requests.html"><i class="material-icons">emoji_people</i>Requests</a>
+    <a class="nav-link desktop-button" href="/offers.html"><i class="material-icons">directions_car</i>Offers</a>
+    <a class="nav-link desktop-button active" href="/profile.html"><i class="material-icons">account_circle</i>Profile</a>
+  </nav>
+
+  <div id="profilePage" class="container page-container">
+    <div class="align-items-center row">
+      <img src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png"
+        alt="Profile Picture" id="profilePicture">
+      <h6 id="profileName" class="text-muted">John Doe</h6>
+      <div class="dropdown">
+        <button class="btn bmd-btn-icon dropdown-toggle" type="button" id="ex1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          <i class="material-icons">more_vert</i>
+        </button>
+        <div class="dropdown-menu dropdown-menu-left" aria-labelledby="ex1">
+          <button class="dropdown-item" type="button">Action</button>
+          <button class="dropdown-item disabled" type="button">Another action</button>
+          <button class="dropdown-item" type="button">Another action</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  <button id="signOutButton" type="button" class="btn">Sign Out</button>
+
+  <div class="navbar bottom-nav fixed-bottom">
+    <a class="nav-link" href="/home.html"><i class="material-icons">home</i>
+      <div>Home</div>
+    </a>
+    <a class="nav-link" href="/requests.html"><i class="material-icons">emoji_people</i>
+      <div>Requests</div>
+    </a>
+    <a class="nav-link" href="/offers.html"><i class="material-icons">directions_car</i>
+      <div>Offers</div>
+    </a>
+    <a class="nav-link active" href="/profile.html"><i class="material-icons">account_circle</i>
+      <div>Profile</div>
+    </a>
+  </div>
+  <script src="scripts/jquery.min.js"></script>
+  <script src="scripts/popper.js"></script>
+  <script src="scripts/bootstrap-material-design.js"></script>
+  <script>
+    $("body").bootstrapMaterialDesign();
+  </script>
+  <script src="/__/firebase/7.18.0/firebase-app.js"></script>
+  <script src="/__/firebase/7.18.0/firebase-analytics.js"></script>
+  <script src="/__/firebase/7.18.0/firebase-auth.js"></script>
+  <script src="/__/firebase/7.18.0/firebase-firestore.js"></script>
+  <script src="scripts/rosefire.min.js"></script>
+  <script src="/__/firebase/init.js"></script>
+  <script src="scripts/main.js"></script>
+</body>
+
+</html>

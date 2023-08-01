@@ -6,6 +6,7 @@ body {
     background-color: #800000;
     color: white;
     padding-bottom: 0;
+    width: 100vw;
 }
 
 .navbar-brand {
@@ -14,6 +15,7 @@ body {
 
 .bottom-nav {
     padding-top: 2px;
+    padding-right: 16px;
 }
 
 .bottom-nav a {
@@ -73,6 +75,15 @@ body {
     width: 40px;
     border-radius: 100%;
     margin-left: 10px;
+}
+
+#profilePicture {
+    width: 80px;
+    border-radius: 100%;
+}
+
+#profilePage {
+    max-width: 90%;
 }
 
 .card-username {
@@ -144,7 +155,7 @@ button > i {
     margin-right: 10px;
 }
 
-#rosefireButton {
+#rosefireButton, #signOutButton {
     display: block;
     margin: 60px auto;
     color: white;
@@ -175,5 +186,11 @@ button > i {
     }
     .desktop-button {
         display: block;
+    }
+}
+
+@media (min-width: 992px) {
+    .navbar {
+        padding-right: 40px;
     }
 }
