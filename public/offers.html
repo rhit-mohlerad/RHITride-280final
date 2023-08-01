@@ -14,8 +14,8 @@
   <nav class="navbar navbar-dark fixed-top">
     <a class="navbar-brand" href="/home.html">Ride Requests</a>
     <a class="nav-link desktop-button" href="/home.html"><i class="material-icons">home</i>Home</a>
-    <a class="nav-link desktop-button active" href="/requests.html"><i class="material-icons">emoji_people</i>Requests</a>
-    <a class="nav-link desktop-button" href="/offers.html"><i class="material-icons">directions_car</i>Offers</a>
+    <a class="nav-link desktop-button" href="/requests.html"><i class="material-icons">emoji_people</i>Requests</a>
+    <a class="nav-link desktop-button active" href="/offers.html"><i class="material-icons">directions_car</i>Offers</a>
     <a class="nav-link desktop-button" href="/profile.html"><i class="material-icons">account_circle</i>Profile</a>
   </nav>
   <div id="mainPage" class="container page-container">
@@ -23,10 +23,10 @@
     <div class="card">
       <div class="card-body">
         <div class="align-items-center row">
-          <img src="https://hips.hearstapps.com/hmg-prod/images/john-adams-gettyimages-3246312.jpg"
+          <img src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png"
             alt="Profile Picture" class="card-pfp">
-          <h6 class="text-muted card-username">John's Request</h6>
-          <div class="ride-type">Drop-Off Only</div>
+          <h6 class="text-muted card-username">John Doe's Ride</h6>
+          <div class="card-seats-available">1 seat available</div>
         </div>
         <div class="card-locations">
           <h6 class="text-muted card-from">From: Walmart Supercenter</h6>
@@ -34,10 +34,11 @@
         </div>
         <div class="bottom-row row">
           <div class="card-times">
-            <h6 class="text-muted card-departure">Departure Time: 3:30pm</h6>
+            <h6 class="text-muted card-departure">Departure Time: 2:45pm</h6>
+            <h6 class="text-muted card-return">Return Time: 3:00pm</h6>
           </div>
           <div class="card-money row align-items-center">
-            <div class="pay-text">Pays&nbsp;</div>
+            <div class="">Price:&nbsp;</div>
             <div class="card-value">$10</div>
           </div>
         </div>
@@ -47,47 +48,24 @@
     <div class="card">
       <div class="card-body">
         <div class="align-items-center row">
-          <img src="https://lumiere-a.akamaihd.net/v1/images/character_themuppets_kermit_b77a431b.jpeg?region=0%2C0%2C450%2C450"
+          <img src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png"
             alt="Profile Picture" class="card-pfp">
-          <h6 class="text-muted card-username">Kermit's Request</h6>
-          <div class="ride-type">Drop-Off Only</div>
+          <h6 class="text-muted card-username">Dohn Joe's Ride</h6>
+          <!-- Note: change background color based on # seats available and remove extra id "second-post" used to hardcode a different color -->
+          <div id="second-post" class="card-seats-available">3 seats available</div>
         </div>
         <div class="card-locations">
-          <h6 class="text-muted card-from">From: Sesame Street</h6>
-          <h6 class="text-muted card-to">To: Muppet Theatre</h6>
+          <h6 class="text-muted card-from">From: Culver's</h6>
+          <h6 class="text-muted card-to">To: Walmart Supercenter</h6>
         </div>
         <div class="bottom-row row">
           <div class="card-times">
             <h6 class="text-muted card-departure">Departure Time: 4:15pm</h6>
+            <h6 class="text-muted card-return">Return Time: 4:30pm</h6>
           </div>
           <div class="card-money row align-items-center">
-            <div class="pay-text">Pays&nbsp;</div>
+            <div class="">Price:&nbsp;</div>
             <div class="card-value">$10</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="card-body">
-        <div class="align-items-center row">
-          <img src="https://lumiere-a.akamaihd.net/v1/images/ct_mickeymouseandfriends_mickey_ddt-16970_4e99445d.jpeg?region=0,0,600,600&width=480"
-            alt="Profile Picture" class="card-pfp">
-          <h6 class="text-muted card-username">Mickey's Request</h6>
-          <div class="ride-type">Round Trip</div>
-        </div>
-        <div class="card-locations">
-          <h6 class="text-muted card-from">From: Mickey's Clubhouse</h6>
-          <h6 class="text-muted card-to">To: Donald Trump's House</h6>
-        </div>
-        <div class="bottom-row row">
-          <div class="card-times">
-            <h6 class="text-muted card-departure">Departure Time: 2:45pm</h6>
-            <h6 class="text-muted card-return">Return Time: 3:45pm</h6>
-          </div>
-          <div class="card-money row align-items-center">
-            <div class="pay-text">Pays&nbsp;</div>
-            <div class="card-value">$25</div>
           </div>
         </div>
       </div>
@@ -98,10 +76,10 @@
     <a class="nav-link" href="/home.html"><i class="material-icons">home</i>
       <div>Home</div>
     </a>
-    <a class="nav-link active" href="/requests.html"><i class="material-icons">emoji_people</i>
+    <a class="nav-link" href="/requests.html"><i class="material-icons">emoji_people</i>
       <div>Requests</div>
     </a>
-    <a class="nav-link" href="/offers.html"><i class="material-icons">directions_car</i>
+    <a class="nav-link active" href="/offers.html"><i class="material-icons">directions_car</i>
       <div>Offers</div>
     </a>
     <a class="nav-link" href="/profile.html"><i class="material-icons">account_circle</i>
