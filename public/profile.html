@@ -16,28 +16,45 @@
     <a class="nav-link desktop-button" href="/home.html"><i class="material-icons">home</i>Home</a>
     <a class="nav-link desktop-button" href="/requests.html"><i class="material-icons">emoji_people</i>Requests</a>
     <a class="nav-link desktop-button" href="/offers.html"><i class="material-icons">directions_car</i>Offers</a>
-    <a class="nav-link desktop-button active" href="/profile.html"><i class="material-icons">account_circle</i>Profile</a>
+    <a class="nav-link desktop-button active" href="/profile.html"><i
+        class="material-icons">account_circle</i>Profile</a>
   </nav>
 
   <div id="profilePage" class="container page-container">
     <div class="align-items-center row">
-      <img src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png"
-        alt="Profile Picture" id="profilePicture">
-      <h6 id="profileName" class="text-muted">John Doe</h6>
+      <div class="row" id="profileNameAndPhoto">
+        <img src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png"
+          alt="Profile Picture" id="profilePicture">
+        <h6 id="profileName">John Doe's Profile</h6>
+      </div>
       <div class="dropdown">
-        <button class="btn bmd-btn-icon dropdown-toggle" type="button" id="ex1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <button class="btn bmd-btn-icon dropdown-toggle" type="button" id="profileDropdown" data-toggle="dropdown"
+          aria-haspopup="true" aria-expanded="false">
           <i class="material-icons">more_vert</i>
         </button>
-        <div class="dropdown-menu dropdown-menu-left" aria-labelledby="ex1">
-          <button class="dropdown-item" type="button">Action</button>
-          <button class="dropdown-item disabled" type="button">Another action</button>
-          <button class="dropdown-item" type="button">Another action</button>
+        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="profileDropdown">
+          <button id="profileEditButton" class="dropdown-item" type="button">Edit Profile</button>
+          <button id="signOutButton" class="dropdown-item" type="button">Sign Out</button>
         </div>
       </div>
     </div>
 
+    <h6 id="profileCarInfo">Car: 6 Seat Dodge Caravan<h6>
+        <h6 id="profilePhoneNumber">Phone Number: 123-456-7890</h6>
+        <h6><img
+            src="https://images.ctfassets.net/gkyt4bl1j2fs/ym6BkLqyGjMBmiCwtM7AW/829bf561ea771c00839b484cb8edeebb/App_Icon.png?w=276&h=276&q=50&fm=png&bg=transparent"
+            id="venmoLogo"> @JohnDoeVenmo</h6>
+        <h6><img
+            src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSkPkkIBTYCgbLrhPxDHhsYtaj-aLE-gWjZ8A&usqp=CAU"
+            id="cashAppLogo"> @JohnDoeCashApp</h6>
+
+        <h6 class="text-muted hr-text">Current Rides</h6>
+        <hr>
+
+        <div id="profileRidesContainer"></div>
+
+
   </div>
-  <button id="signOutButton" type="button" class="btn">Sign Out</button>
 
   <div class="navbar bottom-nav fixed-bottom">
     <a class="nav-link" href="/home.html"><i class="material-icons">home</i>
