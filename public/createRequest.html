@@ -17,6 +17,32 @@
       </span> Create Request</a>
   </nav>
   <div id="createRequestPage" class="container page-container">
+    <div class="create-heading">Location</div>
+
+    <div class="form-group">
+      <label for="startingLocation" class="bmd-label-floating"><span class="material-icons">
+          adjust
+        </span>Choose starting point</label>
+      <input type="text" class="form-control" id="startingLocation">
+    </div>
+    <div class="form-group">
+      <label for="destinationLocation" class="bmd-label-floating"><span class="material-icons">
+          place
+        </span>Choose destination</label>
+      <input type="text" class="form-control" id="destinationLocation">
+    </div>
+
+    <label for="request-start-time">Enter a departure time:</label>
+    <input type="datetime-local" id="request-start-time" name="request-start-time" value="2018-06-12T19:30" min="2018-06-07T00:00"
+      max="2100-06-14T00:00" />
+    <div class="custom-control custom-checkbox">
+      <input type="checkbox" class="custom-control-input" id="roundTripCheck">
+      <label class="custom-control-label" for="roundTripCheck">Round trip?</label>
+    </div>
+    <label for="request-return-time">Enter a return time:</label>
+    <input type="datetime-local" id="request-return-time" name="request-return-time" value="2018-06-12T19:30" min="2018-06-07T00:00"
+      max="2100-06-14T00:00" />
+
   </div>
 
   <script src="scripts/jquery.min.js"></script>

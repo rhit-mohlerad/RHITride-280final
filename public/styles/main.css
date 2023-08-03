@@ -217,6 +217,15 @@ button > i {
     margin-left: 15px;
 }
 
+.create-heading {
+    font-weight: 600;
+    font-size: 1.5em;
+}
+
+#request-return-time {
+    display: none;
+}
+
 @media (min-width: 768px) {
     .bottom-nav {
         display: none;

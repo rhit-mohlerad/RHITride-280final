@@ -393,6 +393,14 @@ rhit.ProfilePageController = class {
 
 }
 
+rhit.CreateRequestPageController = class {
+	constructor() {
+		if (document.querySelector("#roundTripCheck").checked) {
+			document.querySelector("#request-return-time").style.display = "block";
+		}
+	}
+}
+
 
 
 //----------------------------- Managers -----------------------------
@@ -578,6 +586,12 @@ rhit.initializePage = function () {
 		console.log("requests page");
 		rhit.fbRequestsManager = new rhit.FbRequestsManager();
 		new rhit.RequestsPageController();
+	}
+
+	if (document.querySelector("#createRequestPage")) {
+		console.log("create requests page");
+		rhit.fbRequestsManager = new rhit.FbRequestsManager();
+		new rhit.CreateRequestPageController();
 	}
 
 	if (document.querySelector("#offersPage")) {
