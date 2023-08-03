@@ -398,8 +398,10 @@ rhit.CreateRequestPageController = class {
 		document.querySelector("#roundTripCheck").onclick = (event) => {
 			if (document.querySelector("#roundTripCheck").checked) {
 				document.querySelector(".hide-on-click").style.display = "block";
+				document.querySelector("#request-return-time").disabled = false;
 			} else {
 				document.querySelector(".hide-on-click").style.display = "none";
+				document.querySelector("#request-return-time").disabled = true;
 			}
 		}
 	}
