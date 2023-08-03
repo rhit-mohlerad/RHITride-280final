@@ -17,20 +17,44 @@
       </span> Request Details</a>
   </nav>
   <div id="requestDetailPage" class="container page-container">
-  </div>
+    <div class="detail-body request-details">
+      <div class="align-items-center row">
+        <img src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png"
+          alt="Profile Picture" class="detail-pfp">
+        <h6 class="text-muted detail-username">John Doe's Ride</h6>
+        <div class="detail-seats-available">1 seat available</div>
+      </div>
+      <div class="detail-locations">
+        <h6 class="text-muted detail-from">From: Walmart Supercenter</h6>
+        <h6 class="text-muted detail-to">To: Culver's</h6>
+      </div>
+      <div class="bottom-row row">
+        <div class="detail-times">
+          <h6 class="text-muted detail-departure">Departure Time: 2:45pm</h6>
+          <h6 class="text-muted detail-return">Return Time: 3:00pm</h6>
+        </div>
+        <div class="detail-money row align-items-center">
+          <div class="">Price:&nbsp;</div>
+          <div class="detail-value">$10</div>
+        </div>
+      </div>
+    </div>
 
-  <script src="scripts/jquery.min.js"></script>
-  <script src="scripts/popper.js"></script>
-  <script src="scripts/bootstrap-material-design.js"></script>
-  <script>
-    $("body").bootstrapMaterialDesign();
-  </script>
-  <script src="/__/firebase/7.18.0/firebase-app.js"></script>
-  <script src="/__/firebase/7.18.0/firebase-analytics.js"></script>
-  <script src="/__/firebase/7.18.0/firebase-auth.js"></script>
-  <script src="/__/firebase/7.18.0/firebase-firestore.js"></script>
-  <script src="/__/firebase/init.js"></script>
-  <script src="scripts/main.js"></script>
+    <button id="requestDetailActionButton" type="button" class="btn">Loading button
+    </button>
+
+    <script src="scripts/jquery.min.js"></script>
+    <script src="scripts/popper.js"></script>
+    <script src="scripts/bootstrap-material-design.js"></script>
+    <script>
+      $("body").bootstrapMaterialDesign();
+    </script>
+    <script src="/__/firebase/7.18.0/firebase-app.js"></script>
+    <script src="/__/firebase/7.18.0/firebase-analytics.js"></script>
+    <script src="/__/firebase/7.18.0/firebase-auth.js"></script>
+    <script src="/__/firebase/7.18.0/firebase-firestore.js"></script>
+    <script src="/__/firebase/init.js"></script>
+    <script src="scripts/main.js"></script>
 </body>
 
 </html>

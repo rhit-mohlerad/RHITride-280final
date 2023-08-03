@@ -16,6 +16,7 @@ rhit.FB_COLLECTION_USERS = "Users";
 rhit.fbAuthManager = null;
 rhit.fbOffersManager = null;
 rhit.fbRequestsManager = null;
+rhit.fbSingleRequestManager = null;
 
 // from: https://stackoverflow.com/questions/494143/creating-a-new-dom-element-from-an-html-string-using-built-in-dom-methods-or-pro/35385518#35385518
 function htmlToElement(html) {
@@ -421,6 +422,28 @@ rhit.CreateRequestPageController = class {
 	}
 }
 
+rhit.RequestDetailPageController = class {
+	constructor() {
+		rhit.fbSingleRequestManager.beginListening(this.updateView.bind(this));
+	
+	}
+
+	updateView() {
+		if (rhit.fbSingleRequestManager.requester == rhit.fbAuthManager.uid) {
+			const button = document.querySelector("#requestDetailActionButton");
+			button.innerHTML = "Cancel Request";
+			button.onclick = (event) => {
+				rhit.fbSingleRequestManager.delete().then(() => {
+					console.log("Document successfully deleted!");
+					window.location.href = "/home.html";
+				}).catch((error) => {
+					console.error("Error removing document: ", error);
+				});;
+			}
+		}
+	};
+}
+
 
 
 //----------------------------- Managers -----------------------------
@@ -479,6 +502,33 @@ rhit.FbRequestsManager = class {
 			docSnapshot.get("comment"),
 		);
 		return request;
+	}
+}
+
+rhit.FbSingleRequestManager = class {
+	constructor(requestId) {
+		this._documentSnapshot = {};
+		this._ref = firebase.firestore().collection(rhit.FB_COLLECTION_REQUESTS).doc(requestId);
+	}
+	
+	beginListening(changeListener) {
+		this._unsubscribe = this._ref.onSnapshot((doc) => {
+			if (doc.exists) {
+				console.log("Document data: ", doc.data());
+				this._documentSnapshot = doc;
+				changeListener();
+			} else {
+				console.log("No such document!");
+			}
+		});
+	}
+
+	delete() {
+		return this._ref.delete();
+	}
+
+	get requester() {
+		return this._documentSnapshot.get("requester");
 	}
 }
 
@@ -607,6 +657,13 @@ rhit.initializePage = function () {
 		console.log("requests page");
 		rhit.fbRequestsManager = new rhit.FbRequestsManager();
 		new rhit.RequestsPageController();
+	}
+
+	if (document.querySelector("#requestDetailPage")) {
+		console.log("requests detail page");
+		const reqId = urlParams.get("id");
+		rhit.fbSingleRequestManager = new rhit.FbSingleRequestManager(reqId);
+		new rhit.RequestDetailPageController();
 	}
 
 	if (document.querySelector("#createRequestPage")) {
