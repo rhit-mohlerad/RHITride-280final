@@ -48,13 +48,22 @@
 
     <form class="form-inline">
       <div class="form-group">
-        <label id="requestMoneyLabel" for="moneyInput" class="bmd-label">How much are you willing to pay?</label>
+        <label id="requestMoneyLabel" for="requestMoneyInput" class="bmd-label">How much are you willing to pay?</label>
         <div class="dollar-sign">
-          <input type="number" class="form-control" id="moneyInput">
+          <input type="number" class="form-control" id="requestMoneyInput">
         </div>
       </div>
     </form>
+
+    <div>
+      <label for="requestAdditionalComments" class="">Additional comments:</label>
+      <input type="text" class="form-control" id="requestAdditionalComments" placeholder="Add any additional comments here...">
+    </div>  
   </div>
+
+  <button id="submitRequestButton" type="button" class="btn">
+    <i class="material-icons">chevron_left</i>Submit
+  </button>
 
   <script src="scripts/jquery.min.js"></script>
   <script src="scripts/popper.js"></script>

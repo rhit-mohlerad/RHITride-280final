@@ -236,9 +236,19 @@ button>i {
     color: black;
 }
 
-#moneyInput {
+#requestMoneyInput {
     max-width: 60px;
 }
+
+#submitRequestButton {
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+    color: #800000;
+    z-index: 99999;
+    font-size: 1.2em;
+}
+
 
 div.dollar-sign {
     position: relative;
