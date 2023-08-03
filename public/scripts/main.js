@@ -404,6 +404,20 @@ rhit.CreateRequestPageController = class {
 				document.querySelector("#request-return-time").disabled = true;
 			}
 		}
+
+		document.querySelector("#submitRequestButton").onclick = (event) => {
+			const requester = rhit.fbAuthManager.uid;
+			const startTime = new Date(document.querySelector("#request-start-time").value);
+			let endTime = null;
+			if (document.querySelector("#roundTripCheck").checked) {
+				endTime = new Date(document.querySelector("#request-return-time").value);
+			}
+			const payment = parseInt(document.querySelector("#requestMoneyInput").value);
+			const start = document.querySelector("#startingLocation").value;
+			const dest = document.querySelector("#destinationLocation").value;
+			const comment = document.querySelector("#requestAdditionalComments").value;
+			rhit.fbRequestsManager.add(requester, startTime, endTime, payment, start, dest, comment);
+		}
 	}
 }
 
@@ -430,6 +444,7 @@ rhit.FbRequestsManager = class {
 			})
 			.then(function (docRef) {
 				console.log("Document written with ID: ", docRef.id);
+				window.location.href=`/requestDetails.html?id=${docRef.id}`
 			})
 			.catch(function (error) {
 				console.error("Error adding document: ", error);
