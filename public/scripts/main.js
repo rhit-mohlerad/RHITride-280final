@@ -85,12 +85,15 @@ rhit.RequestsPageController = class {
 	constructor() {
 		rhit.fbRequestsManager.beginListening(this.updateList.bind(this));
 	}
-
+	//Had to add "async" and "await" because there was some concurrency error or something
 	async _createCard(request) {
+		//getting doc
 		this._ref = await firebase.firestore().collection(rhit.FB_COLLECTION_USERS).doc(request.requester).get()
+		//getting data from doc
 		const _requester = this._ref.data();
 		this.tripInfo = "Drop-Off Only";
 		this.returnTime = "";
+		//this gets the Timestamp() from firebase and converts it to a formatted JS date.
 		this.startTime = request.startTime.toDate().toLocaleDateString('en-us', {
 			weekday: "long",
 			month: "long",
@@ -98,6 +101,7 @@ rhit.RequestsPageController = class {
 			hour: '2-digit',
 			minute: '2-digit'
 		});
+		//If there's an end time then change the text and format the time.
 		if (request.endTime) {
 			this.tripInfo = "Round-Trip";
 			this.endTime = request.endTime.toDate().toLocaleDateString('en-us', {
@@ -107,6 +111,7 @@ rhit.RequestsPageController = class {
 				hour: '2-digit',
 				minute: '2-digit'
 			});
+			//this will get added to the html element below the departure time.
 			this.returnTime = `<h6 class="text-muted card-return">Return Time: ${this.endTime}</h6>`
 		}
 		return htmlToElement(`<div class="card">
@@ -135,9 +140,7 @@ rhit.RequestsPageController = class {
 	}
 
 	async updateList() {
-		//make a new quoteListContainer
 		const newList = htmlToElement('<div class="list-container"></div>');
-		//fill quoteListContainer with quote cards using a loop
 		for (let i = 0; i < rhit.fbRequestsManager.length; i++) {
 			const request = rhit.fbRequestsManager.getRequestAtIndex(i);
 			const newCard = await this._createCard(request);
@@ -151,11 +154,9 @@ rhit.RequestsPageController = class {
 		}
 
 
-		//remove the old quoteListContainer
 		const oldList = document.querySelector(".list-container");
 		oldList.removeAttribute("class");
 		oldList.hidden = true;
-		//Put in the new quoteListContainer
 		oldList.parentElement.appendChild(newList);
 	}
 
@@ -165,7 +166,6 @@ rhit.RequestsPageController = class {
 rhit.OffersPageController = class {
 	constructor() {
 		rhit.fbOffersManager.beginListening(this.updateList.bind(this));
-		this._userSnapshot = {};
 	}
 
 	beginListening(changeListener) {
@@ -219,7 +219,7 @@ rhit.OffersPageController = class {
 					  ${this.returnTime}
 					</div>
 					<div class="card-money row align-items-center">
-					  <div class="">Price:&nbsp;</div>
+					  <div class="pay-text">Price:&nbsp;</div>
 					  <div class="card-value">$${offer.price}</div>
 					</div>
 				  </div>
@@ -228,9 +228,7 @@ rhit.OffersPageController = class {
 	}
 
 	async updateList() {
-		//make a new quoteListContainer
 		const newList = htmlToElement('<div class="list-container"></div>');
-		//fill quoteListContainer with quote cards using a loop
 		for (let i = 0; i < rhit.fbOffersManager.length; i++) {
 			const offer = rhit.fbOffersManager.getOfferAtIndex(i);
 			const newCard = await this._createCard(offer);
@@ -244,11 +242,9 @@ rhit.OffersPageController = class {
 		}
 
 
-		//remove the old quoteListContainer
 		const oldList = document.querySelector(".list-container");
 		oldList.removeAttribute("class");
 		oldList.hidden = true;
-		//Put in the new quoteListContainer
 		oldList.parentElement.appendChild(newList);
 	}
 }
@@ -260,6 +256,139 @@ rhit.ProfilePageController = class {
 		document.querySelector("#signOutButton").onclick = (event) => {
 			rhit.fbAuthManager.signOut();
 		}
+	}
+
+	async _createRequestCard(request) {
+		//getting doc
+		this._ref = await firebase.firestore().collection(rhit.FB_COLLECTION_USERS).doc(request.requester).get()
+		//getting data from doc
+		const _requester = this._ref.data();
+		this.tripInfo = "Drop-Off Only";
+		this.returnTime = "";
+		//this gets the Timestamp() from firebase and converts it to a formatted JS date.
+		this.startTime = request.startTime.toDate().toLocaleDateString('en-us', {
+			weekday: "long",
+			month: "long",
+			day: "numeric",
+			hour: '2-digit',
+			minute: '2-digit'
+		});
+		//If there's an end time then change the text and format the time.
+		if (request.endTime) {
+			this.tripInfo = "Round-Trip";
+			this.endTime = request.endTime.toDate().toLocaleDateString('en-us', {
+				weekday: "long",
+				month: "long",
+				day: "numeric",
+				hour: '2-digit',
+				minute: '2-digit'
+			});
+			//this will get added to the html element below the departure time.
+			this.returnTime = `<h6 class="text-muted card-return">Return Time: ${this.endTime}</h6>`
+		}
+		return htmlToElement(`<div class="card">
+			<div class="card-body">
+			  <div class="align-items-center row">
+				<img src="${_requester.profilePic}"
+				  alt="Profile Picture" class="card-pfp">
+				<h6 class="text-muted card-username">${_requester.displayName}'s Request</h6>
+				<div class="ride-type">${this.tripInfo}</div>
+			  </div>
+			  <div class="card-locations">
+				<h6 class="text-muted card-from">From: ${request.start}</h6>
+				<h6 class="text-muted card-to">To: ${request.dest}</h6>
+			  </div>
+			  <div class="bottom-row row">
+				<div class="card-times">
+				  <h6 class="text-muted card-departure">Departure Time: ${this.startTime}</h6>
+				  ${this.returnTime}
+				</div>
+				<div class="card-money row align-items-center">
+				  <div class="pay-text">Pays&nbsp;</div>
+				  <div class="card-value">$${request.payment}</div>
+				</div>
+			  </div>
+			</div>`);
+	}
+
+	async _createOfferCard(offer) {
+		this._ref = await firebase.firestore().collection(rhit.FB_COLLECTION_USERS).doc(offer.driver).get()
+		const _driver = this._ref.data();
+		this.returnTime = "";
+		this.startTime = offer.startTime.toDate().toLocaleDateString('en-us', {
+			weekday: "long",
+			month: "long",
+			day: "numeric",
+			hour: '2-digit',
+			minute: '2-digit'
+		});
+		if (offer.endTime) {
+			this.endTime = offer.endTime.toDate().toLocaleDateString('en-us', {
+				weekday: "long",
+				month: "long",
+				day: "numeric",
+				hour: '2-digit',
+				minute: '2-digit'
+			});
+			this.returnTime = `<h6 class="text-muted card-return">Return Time: ${this.endTime}</h6>`
+		}
+		return htmlToElement(`<div class="card">
+				<div class="card-body">
+				  <div class="align-items-center row">
+					<img src="${_driver.profilePic}"
+					  alt="Profile Picture" class="card-pfp">
+					<h6 class="text-muted card-username">${_driver.displayName}'s Ride</h6>
+					<div class="card-seats-available">${offer.seats - offer.riders.length} seats available</div>
+				  </div>
+				  <div class="card-locations">
+					<h6 class="text-muted card-from">From: ${offer.start}</h6>
+					<h6 class="text-muted card-to">To: ${offer.dest}</h6>
+				  </div>
+				  <div class="bottom-row row">
+					<div class="card-times">
+					  <h6 class="text-muted card-departure">Departure Time: ${this.startTime}</h6>
+					  ${this.returnTime}
+					</div>
+					<div class="card-money row align-items-center">
+					  <div class="pay-text">Price:&nbsp;</div>
+					  <div class="card-value">$${offer.price}</div>
+					</div>
+				  </div>
+				</div>
+			  </div>`);
+	}
+
+	async updateList() {
+		const newList = htmlToElement('<div class="list-container"></div>');
+		for (let i = 0; i < rhit.fbRequestsManager.length; i++) {
+			const request = rhit.fbRequestsManager.getRequestAtIndex(i);
+			const newCard = await this._createRequestCard(request);
+
+			newCard.onclick = (event) => {
+
+				window.location.href = `/requestDetails.html?id=${request.id}`;
+			}
+
+			newList.appendChild(newCard);
+		}
+		for (let i = 0; i < rhit.fbOffersManager.length; i++) {
+			const offer = rhit.fbOffersManager.getOfferAtIndex(i);
+			const newCard = await this._createOfferCard(offer);
+
+			newCard.onclick = (event) => {
+
+				window.location.href = `/offerDetails.html?id=${offer.id}`;
+			}
+
+			newList.appendChild(newCard);
+		}
+
+
+
+		const oldList = document.querySelector(".list-container");
+		oldList.removeAttribute("class");
+		oldList.hidden = true;
+		oldList.parentElement.appendChild(newList);
 	}
 
 }
@@ -293,6 +422,7 @@ rhit.FbRequestsManager = class {
 			});
 	}
 	beginListening(changeListener) {
+		//Closest start time is at the top. We still need to implement the auto-delete of documents that are outdated.
 		let query = this._ref.orderBy("startTime", "asc").limit(50);
 		if (this._uid) {
 			query = query.where("requester", "==", this._uid);
@@ -439,6 +569,9 @@ rhit.initializePage = function () {
 
 	if (document.querySelector("#profilePage")) {
 		console.log("profile page");
+		const uid = urlParams.get("uid");
+		rhit.fbRequestsManager = new rhit.FbRequestsManager(uid);
+		rhit.fbOffersManager = new rhit.FbOffersManager(uid);
 		new rhit.ProfilePageController();
 	}
 	if (document.querySelector("#requestsPage")) {

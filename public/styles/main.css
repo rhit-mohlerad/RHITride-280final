@@ -87,6 +87,10 @@ body {
     text-align: center;
 }
 
+#profilePage>.list-container {
+    text-align: left;
+}
+
 #profileName {
     margin-left: 10px;
 }
