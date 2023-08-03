@@ -13,11 +13,9 @@ var rhit = rhit || {};
 rhit.FB_COLLECTION_REQUESTS = "Requests";
 rhit.FB_COLLECTION_OFFERS = "Offers";
 rhit.FB_COLLECTION_USERS = "Users";
-//add more keys
 rhit.fbAuthManager = null;
 rhit.fbOffersManager = null;
 rhit.fbRequestsManager = null;
-//add other managers
 
 // from: https://stackoverflow.com/questions/494143/creating-a-new-dom-element-from-an-html-string-using-built-in-dom-methods-or-pro/35385518#35385518
 function htmlToElement(html) {
@@ -27,7 +25,7 @@ function htmlToElement(html) {
 	return template.content.firstChild;
 }
 
-
+//Class for making Request objects
 rhit.Request = class {
 	constructor(id, requester, startTime, endTime, payment, start, dest, comment) {
 		this.id = id;
@@ -43,6 +41,7 @@ rhit.Request = class {
 
 }
 
+//Class for making Offer objects
 rhit.Offer = class {
 	constructor(id, driver, startTime, endTime, price, start, dest, comment, seats) {
 		this.id = id;
@@ -58,6 +57,7 @@ rhit.Offer = class {
 	}
 }
 
+//----------------------------- Controllers -----------------------------
 rhit.LoginPageController = class {
 	constructor() {
 		document.querySelector("#rosefireButton").onclick = (event) => {
@@ -83,12 +83,22 @@ rhit.RequestsPageController = class {
 		const _requester = this._ref.data();
 		this.tripInfo = "Drop-Off Only";
 		this.returnTime = "";
-		this.startTime = request.startTime.toDate().toLocaleDateString('en-us', { weekday:"long", month:"long", day:"numeric", hour: '2-digit',
-		minute: '2-digit'});
+		this.startTime = request.startTime.toDate().toLocaleDateString('en-us', {
+			weekday: "long",
+			month: "long",
+			day: "numeric",
+			hour: '2-digit',
+			minute: '2-digit'
+		});
 		if (request.endTime) {
 			this.tripInfo = "Round-Trip";
-			this.endTime = request.endTime.toDate().toLocaleDateString('en-us', { weekday:"long", month:"long", day:"numeric", hour: '2-digit',
-			minute: '2-digit'});
+			this.endTime = request.endTime.toDate().toLocaleDateString('en-us', {
+				weekday: "long",
+				month: "long",
+				day: "numeric",
+				hour: '2-digit',
+				minute: '2-digit'
+			});
 			this.returnTime = `<h6 class="text-muted card-return">Return Time: ${this.endTime}</h6>`
 		}
 		return htmlToElement(`<div class="card">
@@ -166,11 +176,21 @@ rhit.OffersPageController = class {
 		this._ref = await firebase.firestore().collection(rhit.FB_COLLECTION_USERS).doc(offer.driver).get()
 		const _driver = this._ref.data();
 		this.returnTime = "";
-		this.startTime = offer.startTime.toDate().toLocaleDateString('en-us', { weekday:"long", month:"long", day:"numeric", hour: '2-digit',
-		minute: '2-digit'});
+		this.startTime = offer.startTime.toDate().toLocaleDateString('en-us', {
+			weekday: "long",
+			month: "long",
+			day: "numeric",
+			hour: '2-digit',
+			minute: '2-digit'
+		});
 		if (offer.endTime) {
-			this.endTime = offer.endTime.toDate().toLocaleDateString('en-us', { weekday:"long", month:"long", day:"numeric", hour: '2-digit',
-			minute: '2-digit'});
+			this.endTime = offer.endTime.toDate().toLocaleDateString('en-us', {
+				weekday: "long",
+				month: "long",
+				day: "numeric",
+				hour: '2-digit',
+				minute: '2-digit'
+			});
 			this.returnTime = `<h6 class="text-muted card-return">Return Time: ${this.endTime}</h6>`
 		}
 		return htmlToElement(`<div class="card">
@@ -236,6 +256,7 @@ rhit.ProfilePageController = class {
 
 }
 
+//----------------------------- Managers -----------------------------
 rhit.FbRequestsManager = class {
 	constructor(uid) {
 		this._uid = uid;
@@ -262,7 +283,7 @@ rhit.FbRequestsManager = class {
 			});
 	}
 	beginListening(changeListener) {
-		let query = this._ref.orderBy("endTime", "desc").limit(50);
+		let query = this._ref.orderBy("startTime", "asc").limit(50);
 		if (this._uid) {
 			query = query.where("requester", "==", this._uid);
 		}
@@ -299,7 +320,7 @@ rhit.FbOffersManager = class {
 		this._ref = firebase.firestore().collection(rhit.FB_COLLECTION_OFFERS);
 		this._unsubscribe = null;
 	}
-	add(driver, startTime, endTime, price, start, dest, comment, seats, riders,) {
+	add(driver, startTime, endTime, price, start, dest, comment, seats, riders, ) {
 		this._ref.add({
 				["driver"]: driver,
 				["startTime"]: startTime,
@@ -320,7 +341,7 @@ rhit.FbOffersManager = class {
 			});
 	}
 	beginListening(changeListener) {
-		let query = this._ref.orderBy("endTime", "desc").limit(50);
+		let query = this._ref.orderBy("startTime", "asc").limit(50);
 		if (this._uid) {
 			query = query.where("driver", "==", this._uid);
 		}
@@ -370,7 +391,6 @@ rhit.FbAuthManager = class {
 			}
 			console.log("Rosefire success!", rfUser);
 
-			// TODO: Use the rfUser.token with your server.
 			firebase.auth().signInWithCustomToken(rfUser.token).catch((error) => {
 				const errorCode = error.code;
 				const errorMessage = error.message;
