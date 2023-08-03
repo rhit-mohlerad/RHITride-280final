@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Material+Icons">
+  <link rel="stylesheet" href="styles/bootstrap-material-design.min.css">
+  <link rel="stylesheet" href="styles/main.css">
+  <title>RHITride</title>
+</head>
+
+<body>
+  <nav class="navbar navbar-dark fixed-top">
+    <a class="navbar-brand" href="/home.html">Offer Details</a>
+    <a class="nav-link desktop-button active" href="/home.html"><i class="material-icons">home</i>Home</a>
+    <a class="nav-link desktop-button" href="/requests.html"><i class="material-icons">emoji_people</i>Requests</a>
+    <a class="nav-link desktop-button" href="/offers.html"><i class="material-icons">directions_car</i>Offers</a>
+    <a class="nav-link desktop-button" href="/profile.html"><i class="material-icons">account_circle</i>Profile</a>
+  </nav>
+  <div id="offersDetailPage" class="container page-container">
+    <button class="mx-auto btn btn-raised" id="createRequestButton" type="button"><i
+        class="material-icons align-middle">add</i>Create Request</button>
+    <button class="mx-auto btn btn-raised" id="createOfferButton" type="button"><i
+        class="material-icons align-middle">add</i>Create Offer</button>
+
+    <div class="hr-text" id="available-rides-text">
+      Available Rides
+    </div>
+    <hr>
+    <div class="list-container">
+
+    </div>
+  </div>
+
+  <div class="navbar bottom-nav fixed-bottom">
+    <a class="nav-link active" href="/home.html"><i class="material-icons">home</i>
+      <div>Home</div>
+    </a>
+    <a class="nav-link" href="/requests.html"><i class="material-icons">emoji_people</i>
+      <div>Requests</div>
+    </a>
+    <a class="nav-link" href="/offers.html"><i class="material-icons">directions_car</i>
+      <div>Offers</div>
+    </a>
+    <a class="nav-link" href="/profile.html"><i class="material-icons">account_circle</i>
+      <div>Profile</div>
+    </a>
+  </div>
+
+  <script src="scripts/jquery.min.js"></script>
+  <script src="scripts/popper.js"></script>
+  <script src="scripts/bootstrap-material-design.js"></script>
+  <script>
+    $("body").bootstrapMaterialDesign();
+  </script>
+  <script src="/__/firebase/7.18.0/firebase-app.js"></script>
+  <script src="/__/firebase/7.18.0/firebase-analytics.js"></script>
+  <script src="/__/firebase/7.18.0/firebase-auth.js"></script>
+  <script src="/__/firebase/7.18.0/firebase-firestore.js"></script>
+  <script src="/__/firebase/init.js"></script>
+  <script src="scripts/main.js"></script>
+</body>
+
+</html>

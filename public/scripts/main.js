@@ -69,6 +69,10 @@ rhit.LoginPageController = class {
 rhit.HomePageController = class {
 	constructor() {
 		rhit.fbOffersManager.beginListening(this.updateList.bind(this));
+
+		document.querySelector("#createRequestButton").onclick = (event) => {
+			window.location.href = `/createRequest.html`
+		}
 	}
 
 }
@@ -255,6 +259,8 @@ rhit.ProfilePageController = class {
 	}
 
 }
+
+
 
 //----------------------------- Managers -----------------------------
 rhit.FbRequestsManager = class {
