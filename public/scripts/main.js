@@ -425,10 +425,10 @@ rhit.CreateRequestPageController = class {
 rhit.RequestDetailPageController = class {
 	constructor() {
 		rhit.fbSingleRequestManager.beginListening(this.updateView.bind(this));
-	
+
 	}
 
-	updateView() {
+	async updateView() {
 		if (rhit.fbSingleRequestManager.requester == rhit.fbAuthManager.uid) {
 			const button = document.querySelector("#requestDetailActionButton");
 			button.innerHTML = "Cancel Request";
@@ -440,6 +440,31 @@ rhit.RequestDetailPageController = class {
 					console.error("Error removing document: ", error);
 				});;
 			}
+			this._ref = await firebase.firestore().collection(rhit.FB_COLLECTION_USERS).doc(rhit.fbSingleRequestManager.requester).get()
+			const _requester = this._ref.data();
+			document.querySelector(".detail-username").innerHTML = `${_requester.displayName}'s Request`;
+			document.querySelector(".detail-pfp").src = _requester.profilePic;
+			document.querySelector(".ride-type").innerHTML = `Drop-Off Only`;
+			document.querySelector(".detail-from").innerHTML = `From: ${rhit.fbSingleRequestManager.start}`;
+			document.querySelector(".detail-to").innerHTML = `To: ${rhit.fbSingleRequestManager.dest}`;
+			document.querySelector(".detail-departure").innerHTML = `Departure Time: ${rhit.fbSingleRequestManager.startTime.toDate().toLocaleDateString('en-us', {
+				weekday: "long",
+				month: "long",
+				day: "numeric",
+				hour: '2-digit',
+				minute: '2-digit'
+			})}`;
+			if (rhit.fbSingleRequestManager.endTime) {
+				document.querySelector(".ride-type").innerHTML =  `Round-Trip`;
+				document.querySelector(".detail-return").innerHTML = `Return Time: ${rhit.fbSingleRequestManager.endTime.toDate().toLocaleDateString('en-us', {
+					weekday: "long",
+					month: "long",
+					day: "numeric",
+					hour: '2-digit',
+					minute: '2-digit'
+				})}`;
+			}
+			document.querySelector(".detail-value").innerHTML = `$${rhit.fbSingleRequestManager.payment}`;
 		}
 	};
 }
@@ -467,7 +492,7 @@ rhit.FbRequestsManager = class {
 			})
 			.then(function (docRef) {
 				console.log("Document written with ID: ", docRef.id);
-				window.location.href=`/requestDetails.html?id=${docRef.id}`
+				window.location.href = `/requestDetails.html?id=${docRef.id}`
 			})
 			.catch(function (error) {
 				console.error("Error adding document: ", error);
@@ -510,7 +535,7 @@ rhit.FbSingleRequestManager = class {
 		this._documentSnapshot = {};
 		this._ref = firebase.firestore().collection(rhit.FB_COLLECTION_REQUESTS).doc(requestId);
 	}
-	
+
 	beginListening(changeListener) {
 		this._unsubscribe = this._ref.onSnapshot((doc) => {
 			if (doc.exists) {
@@ -529,6 +554,24 @@ rhit.FbSingleRequestManager = class {
 
 	get requester() {
 		return this._documentSnapshot.get("requester");
+	}
+	get start() {
+		return this._documentSnapshot.get("start");
+	}
+	get dest() {
+		return this._documentSnapshot.get("dest");
+	}
+	get comment() {
+		return this._documentSnapshot.get("comment");
+	}
+	get startTime() {
+		return this._documentSnapshot.get("startTime");
+	}
+	get endTime() {
+		return this._documentSnapshot.get("endTime");
+	}
+	get payment() {
+		return this._documentSnapshot.get("payment");
 	}
 }
 
