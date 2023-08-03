@@ -32,19 +32,28 @@
       <input type="text" class="form-control" id="destinationLocation">
     </div>
 
+    <div class="create-heading">Time</div>
     <label for="request-start-time">Enter a departure time:</label>
-    <input type="datetime-local" id="request-start-time" name="request-start-time" value="2018-06-12T19:30" min="2018-06-07T00:00"
-      max="2100-06-14T00:00" />
+    <input type="datetime-local" id="request-start-time" name="request-start-time" value="2018-06-12T19:30"
+      min="2018-06-07T00:00" max="2100-06-14T00:00" />
     <div class="custom-control custom-checkbox">
       <input type="checkbox" class="custom-control-input" id="roundTripCheck">
       <label class="custom-control-label" for="roundTripCheck">Round trip?</label>
     </div>
     <div class="hide-on-click">
       <label for="request-return-time">Enter a return time:</label>
-    <input type="datetime-local" id="request-return-time" name="request-return-time" value="2018-06-12T19:30" min="2018-06-07T00:00"
-      max="2100-06-14T00:00" disabled/>
+      <input type="datetime-local" id="request-return-time" name="request-return-time" value="2018-06-12T19:30"
+        min="2018-06-07T00:00" max="2100-06-14T00:00" disabled />
     </div>
 
+    <form class="form-inline">
+      <div class="form-group">
+        <label id="requestMoneyLabel" for="moneyInput" class="bmd-label">How much are you willing to pay?</label>
+        <div class="dollar-sign">
+          <input type="number" class="form-control" id="moneyInput">
+        </div>
+      </div>
+    </form>
   </div>
 
   <script src="scripts/jquery.min.js"></script>

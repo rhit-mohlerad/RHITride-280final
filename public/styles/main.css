@@ -22,11 +22,12 @@ body {
     font-size: 0.8em;
     padding-top: 0;
 }
+
 .bottom-nav i {
     font-size: 2.5em;
 }
 
-.bottom-nav > .nav-link {
+.bottom-nav>.nav-link {
     padding-bottom: 2px;
 }
 
@@ -95,7 +96,8 @@ body {
     margin-left: 10px;
 }
 
-.dropdown, #profileDropdown {
+.dropdown,
+#profileDropdown {
     margin-left: auto;
     height: 40px;
     width: 40px;
@@ -106,7 +108,8 @@ body {
     font-size: 40px;
 }
 
-#venmoLogo, #cashAppLogo {
+#venmoLogo,
+#cashAppLogo {
     width: 30px;
     border-radius: 10px;
 }
@@ -119,7 +122,8 @@ body {
     margin-top: -10px;
 }
 
-.card-seats-available, .ride-type{
+.card-seats-available,
+.ride-type {
     margin-left: auto;
     background-color: rgba(216, 2, 2, 0.361);
     padding: 3px;
@@ -168,7 +172,7 @@ hr {
     color: green;
 }
 
-#mainPage > button {
+#mainPage>button {
     border-radius: 10px;
     background-color: white;
     color: #800000;
@@ -180,7 +184,7 @@ hr {
     font-size: 1em;
 }
 
-button > i {
+button>i {
     margin-right: 10px;
 }
 
@@ -226,10 +230,36 @@ button > i {
     display: none;
 }
 
+#requestMoneyLabel {
+    position: static;
+    margin-right: 5px;
+    color: black;
+}
+
+#moneyInput {
+    max-width: 60px;
+}
+
+div.dollar-sign {
+    position: relative;
+}
+
+div.dollar-sign input {
+    padding-left: 15px;
+}
+
+div.dollar-sign:after {
+    position: absolute;
+    left: 3px;
+    top: 5px;
+    content: '$';
+}
+
 @media (min-width: 768px) {
     .bottom-nav {
         display: none;
     }
+
     .desktop-button {
         display: block;
     }
@@ -239,6 +269,7 @@ button > i {
     .navbar {
         padding-right: 100px;
     }
+
     #profilePage h6 {
         font-size: 1.5em;
     }
