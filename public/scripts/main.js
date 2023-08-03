@@ -395,8 +395,12 @@ rhit.ProfilePageController = class {
 
 rhit.CreateRequestPageController = class {
 	constructor() {
-		if (document.querySelector("#roundTripCheck").checked) {
-			document.querySelector("#request-return-time").style.display = "block";
+		document.querySelector("#roundTripCheck").onclick = (event) => {
+			if (document.querySelector("#roundTripCheck").checked) {
+				document.querySelector(".hide-on-click").style.display = "block";
+			} else {
+				document.querySelector(".hide-on-click").style.display = "none";
+			}
 		}
 	}
 }
