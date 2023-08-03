@@ -68,10 +68,14 @@ rhit.LoginPageController = class {
 
 rhit.HomePageController = class {
 	constructor() {
-		rhit.fbOffersManager.beginListening(this.updateList.bind(this));
+		// rhit.fbOffersManager.beginListening(this.updateList.bind(this));
 
 		document.querySelector("#createRequestButton").onclick = (event) => {
 			window.location.href = `/createRequest.html`
+		}
+
+		document.querySelector("#createOfferButton").onclick = (event) => {
+			window.location.href = `/createOffer.html`
 		}
 	}
 
@@ -428,6 +432,11 @@ rhit.initializePage = function () {
 		console.log("login page");
 		new rhit.LoginPageController();
 	}
+	if (document.querySelector("#mainPage")) {
+		console.log("home page");
+		new rhit.HomePageController();
+	}
+
 	if (document.querySelector("#profilePage")) {
 		console.log("profile page");
 		new rhit.ProfilePageController();
