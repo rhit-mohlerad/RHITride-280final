@@ -13,10 +13,10 @@ var rhit = rhit || {};
 rhit.FB_COLLECTION_REQUESTS = "Requests";
 rhit.FB_COLLECTION_OFFERS = "Offers";
 rhit.FB_COLLECTION_USERS = "Users";
-rhit.FB_KEY_COMMENT = "comment";
-rhit.FB_KEY_DRIVER = "driver";
 //add more keys
 rhit.fbAuthManager = null;
+rhit.fbOffersManager = null;
+rhit.fbRequestsManager = null;
 //add other managers
 
 // from: https://stackoverflow.com/questions/494143/creating-a-new-dom-element-from-an-html-string-using-built-in-dom-methods-or-pro/35385518#35385518
@@ -27,6 +27,37 @@ function htmlToElement(html) {
 	return template.content.firstChild;
 }
 
+
+rhit.Request = class {
+	constructor(id, requester, startTime, endTime, payment, start, dest, comment) {
+		this.id = id;
+		this.requester = requester;
+		this.startTime = startTime;
+		this.endTime = endTime;
+		this.payment = payment;
+		this.start = start;
+		this.dest = dest;
+		this.comment = comment;
+	}
+
+
+}
+
+rhit.Offer = class {
+	constructor(id, driver, startTime, endTime, price, start, dest, comment, seats) {
+		this.id = id;
+		this.driver = driver;
+		this.startTime = startTime;
+		this.endTime = endTime;
+		this.price = price;
+		this.start = start;
+		this.dest = dest;
+		this.comment = comment;
+		this.seats = seats;
+		this.riders = [];
+	}
+}
+
 rhit.LoginPageController = class {
 	constructor() {
 		document.querySelector("#rosefireButton").onclick = (event) => {
@@ -35,11 +66,289 @@ rhit.LoginPageController = class {
 	}
 }
 
+rhit.HomePageController = class {
+	constructor() {
+		rhit.fbOffersManager.beginListening(this.updateList.bind(this));
+	}
+
+}
+
+rhit.RequestsPageController = class {
+	constructor() {
+		rhit.fbRequestsManager.beginListening(this.updateList.bind(this));
+	}
+
+	async _createCard(request) {
+		this._ref = await firebase.firestore().collection(rhit.FB_COLLECTION_USERS).doc(request.requester).get()
+		const _requester = this._ref.data();
+		this.tripInfo = "Drop-Off Only";
+		this.returnTime = "";
+		this.startTime = request.startTime.toDate().toLocaleDateString('en-us', { weekday:"long", month:"long", day:"numeric", hour: '2-digit',
+		minute: '2-digit'});
+		if (request.endTime) {
+			this.tripInfo = "Round-Trip";
+			this.endTime = request.endTime.toDate().toLocaleDateString('en-us', { weekday:"long", month:"long", day:"numeric", hour: '2-digit',
+			minute: '2-digit'});
+			this.returnTime = `<h6 class="text-muted card-return">Return Time: ${this.endTime}</h6>`
+		}
+		return htmlToElement(`<div class="card">
+			<div class="card-body">
+			  <div class="align-items-center row">
+				<img src="${_requester.profilePic}"
+				  alt="Profile Picture" class="card-pfp">
+				<h6 class="text-muted card-username">${_requester.displayName}'s Request</h6>
+				<div class="ride-type">${this.tripInfo}</div>
+			  </div>
+			  <div class="card-locations">
+				<h6 class="text-muted card-from">From: ${request.start}</h6>
+				<h6 class="text-muted card-to">To: ${request.dest}</h6>
+			  </div>
+			  <div class="bottom-row row">
+				<div class="card-times">
+				  <h6 class="text-muted card-departure">Departure Time: ${this.startTime}</h6>
+				  ${this.returnTime}
+				</div>
+				<div class="card-money row align-items-center">
+				  <div class="pay-text">Pays&nbsp;</div>
+				  <div class="card-value">$${request.payment}</div>
+				</div>
+			  </div>
+			</div>`);
+	}
+
+	async updateList() {
+		//make a new quoteListContainer
+		const newList = htmlToElement('<div class="list-container"></div>');
+		//fill quoteListContainer with quote cards using a loop
+		for (let i = 0; i < rhit.fbRequestsManager.length; i++) {
+			const request = rhit.fbRequestsManager.getRequestAtIndex(i);
+			const newCard = await this._createCard(request);
+
+			newCard.onclick = (event) => {
+
+				window.location.href = `/requestDetails.html?id=${request.id}`;
+			}
+
+			newList.appendChild(newCard);
+		}
+
+
+		//remove the old quoteListContainer
+		const oldList = document.querySelector(".list-container");
+		oldList.removeAttribute("class");
+		oldList.hidden = true;
+		//Put in the new quoteListContainer
+		oldList.parentElement.appendChild(newList);
+	}
+
+
+}
+
+rhit.OffersPageController = class {
+	constructor() {
+		rhit.fbOffersManager.beginListening(this.updateList.bind(this));
+		this._userSnapshot = {};
+	}
+
+	beginListening(changeListener) {
+		this._unsubscribe = this._ref.onSnapshot((doc) => {
+			if (doc.exists) {
+				console.log("Document data: ", doc.data());
+				this._documentSnapshot = doc;
+				changeListener();
+			} else {
+				console.log("No such document!");
+			}
+		});
+	}
+
+	async _createCard(offer) {
+		this._ref = await firebase.firestore().collection(rhit.FB_COLLECTION_USERS).doc(offer.driver).get()
+		const _driver = this._ref.data();
+		this.returnTime = "";
+		this.startTime = offer.startTime.toDate().toLocaleDateString('en-us', { weekday:"long", month:"long", day:"numeric", hour: '2-digit',
+		minute: '2-digit'});
+		if (offer.endTime) {
+			this.endTime = offer.endTime.toDate().toLocaleDateString('en-us', { weekday:"long", month:"long", day:"numeric", hour: '2-digit',
+			minute: '2-digit'});
+			this.returnTime = `<h6 class="text-muted card-return">Return Time: ${this.endTime}</h6>`
+		}
+		return htmlToElement(`<div class="card">
+				<div class="card-body">
+				  <div class="align-items-center row">
+					<img src="${_driver.profilePic}"
+					  alt="Profile Picture" class="card-pfp">
+					<h6 class="text-muted card-username">${_driver.displayName}'s Ride</h6>
+					<div class="card-seats-available">${offer.seats - offer.riders.length} seats available</div>
+				  </div>
+				  <div class="card-locations">
+					<h6 class="text-muted card-from">From: ${offer.start}</h6>
+					<h6 class="text-muted card-to">To: ${offer.dest}</h6>
+				  </div>
+				  <div class="bottom-row row">
+					<div class="card-times">
+					  <h6 class="text-muted card-departure">Departure Time: ${this.startTime}</h6>
+					  ${this.returnTime}
+					</div>
+					<div class="card-money row align-items-center">
+					  <div class="">Price:&nbsp;</div>
+					  <div class="card-value">$${offer.price}</div>
+					</div>
+				  </div>
+				</div>
+			  </div>`);
+	}
+
+	async updateList() {
+		//make a new quoteListContainer
+		const newList = htmlToElement('<div class="list-container"></div>');
+		//fill quoteListContainer with quote cards using a loop
+		for (let i = 0; i < rhit.fbOffersManager.length; i++) {
+			const offer = rhit.fbOffersManager.getOfferAtIndex(i);
+			const newCard = await this._createCard(offer);
+
+			newCard.onclick = (event) => {
+
+				window.location.href = `/offerDetails.html?id=${offer.id}`;
+			}
+
+			newList.appendChild(newCard);
+		}
+
+
+		//remove the old quoteListContainer
+		const oldList = document.querySelector(".list-container");
+		oldList.removeAttribute("class");
+		oldList.hidden = true;
+		//Put in the new quoteListContainer
+		oldList.parentElement.appendChild(newList);
+	}
+}
+
 rhit.ProfilePageController = class {
 	constructor() {
+		rhit.fbOffersManager.beginListening(this.updateList.bind(this));
+		rhit.fbRequestsManager.beginListening(this.updateList.bind(this));
 		document.querySelector("#signOutButton").onclick = (event) => {
 			rhit.fbAuthManager.signOut();
 		}
+	}
+
+}
+
+rhit.FbRequestsManager = class {
+	constructor(uid) {
+		this._uid = uid;
+		this._documentSnapshots = [];
+		this._ref = firebase.firestore().collection(rhit.FB_COLLECTION_REQUESTS);
+		this._unsubscribe = null;
+	}
+	add(requester, startTime, endTime, payment, start, dest, comment) {
+		this._ref.add({
+				["requester"]: requester,
+				["startTime"]: startTime,
+				["endTime"]: endTime,
+				["payment"]: payment,
+				["start"]: start,
+				["dest"]: dest,
+				["comment"]: comment,
+
+			})
+			.then(function (docRef) {
+				console.log("Document written with ID: ", docRef.id);
+			})
+			.catch(function (error) {
+				console.error("Error adding document: ", error);
+			});
+	}
+	beginListening(changeListener) {
+		let query = this._ref.orderBy("endTime", "desc").limit(50);
+		if (this._uid) {
+			query = query.where("requester", "==", this._uid);
+		}
+		this._unsubscribe = query.onSnapshot((querySnapshot) => {
+			this._documentSnapshots = querySnapshot.docs;
+			changeListener();
+		});
+	}
+	stopListening() {
+		this._unsubscribe();
+	}
+	get length() {
+		return this._documentSnapshots.length;
+	}
+	getRequestAtIndex(index) {
+		const docSnapshot = this._documentSnapshots[index];
+		const request = new rhit.Request(docSnapshot.id,
+			docSnapshot.get("requester"),
+			docSnapshot.get("startTime"),
+			docSnapshot.get("endTime"),
+			docSnapshot.get("payment"),
+			docSnapshot.get("start"),
+			docSnapshot.get("dest"),
+			docSnapshot.get("comment"),
+		);
+		return request;
+	}
+}
+
+rhit.FbOffersManager = class {
+	constructor(uid) {
+		this._uid = uid;
+		this._documentSnapshots = [];
+		this._ref = firebase.firestore().collection(rhit.FB_COLLECTION_OFFERS);
+		this._unsubscribe = null;
+	}
+	add(driver, startTime, endTime, price, start, dest, comment, seats, riders,) {
+		this._ref.add({
+				["driver"]: driver,
+				["startTime"]: startTime,
+				["endTime"]: endTime,
+				["price"]: price,
+				["start"]: start,
+				["dest"]: dest,
+				["comment"]: comment,
+				["seats"]: seats,
+				["riders"]: riders,
+
+			})
+			.then(function (docRef) {
+				console.log("Document written with ID: ", docRef.id);
+			})
+			.catch(function (error) {
+				console.error("Error adding document: ", error);
+			});
+	}
+	beginListening(changeListener) {
+		let query = this._ref.orderBy("endTime", "desc").limit(50);
+		if (this._uid) {
+			query = query.where("driver", "==", this._uid);
+		}
+		this._unsubscribe = query.onSnapshot((querySnapshot) => {
+			this._documentSnapshots = querySnapshot.docs;
+			changeListener();
+		});
+	}
+	stopListening() {
+		this._unsubscribe();
+	}
+	get length() {
+		return this._documentSnapshots.length;
+	}
+	getOfferAtIndex(index) {
+		const docSnapshot = this._documentSnapshots[index];
+		const offer = new rhit.Offer(docSnapshot.id,
+			docSnapshot.get("driver"),
+			docSnapshot.get("startTime"),
+			docSnapshot.get("endTime"),
+			docSnapshot.get("price"),
+			docSnapshot.get("start"),
+			docSnapshot.get("dest"),
+			docSnapshot.get("comment"),
+			docSnapshot.get("seats"),
+			docSnapshot.get("riders"),
+		);
+		return offer;
 	}
 }
 
@@ -88,6 +397,7 @@ rhit.FbAuthManager = class {
 }
 
 rhit.initializePage = function () {
+	const urlParams = new URLSearchParams(window.location.search);
 	if (document.querySelector("#loginPage")) {
 		console.log("login page");
 		new rhit.LoginPageController();
@@ -95,6 +405,17 @@ rhit.initializePage = function () {
 	if (document.querySelector("#profilePage")) {
 		console.log("profile page");
 		new rhit.ProfilePageController();
+	}
+	if (document.querySelector("#requestsPage")) {
+		console.log("requests page");
+		rhit.fbRequestsManager = new rhit.FbRequestsManager();
+		new rhit.RequestsPageController();
+	}
+
+	if (document.querySelector("#offersPage")) {
+		console.log("offers page");
+		rhit.fbOffersManager = new rhit.FbOffersManager();
+		new rhit.OffersPageController();
 	}
 };
 
