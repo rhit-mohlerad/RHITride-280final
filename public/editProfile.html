@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Material+Icons">
+  <link rel="stylesheet" href="styles/bootstrap-material-design.min.css">
+  <link rel="stylesheet" href="styles/main.css">
+  <title>RHITride</title>
+</head>
+
+<body>
+  <nav class="navbar navbar-dark fixed-top">
+    <a class="navbar-brand" href="/home.html">Edit Profile</a>
+    <a class="nav-link desktop-button" href="/home.html"><i class="material-icons">home</i>Home</a>
+    <a class="nav-link desktop-button" href="/requests.html"><i class="material-icons">emoji_people</i>Requests</a>
+    <a class="nav-link desktop-button" href="/offers.html"><i class="material-icons">directions_car</i>Offers</a>
+    <a class="nav-link desktop-button active" href="/profile.html"><i
+        class="material-icons">account_circle</i>Profile</a>
+  </nav>
+
+  <div id="editProfilePage" class="container page-container">
+    <div class="align-items-center row">
+      <div class="row" id="profileNameAndPhoto">
+        <img src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png"
+          alt="Profile Picture" id="profilePicture">
+        <h6 id="profileName">John Doe's Profile</h6>
+      </div>
+      <div class="dropdown">
+        <button class="btn bmd-btn-icon dropdown-toggle" type="button" id="profileDropdown" data-toggle="dropdown"
+          aria-haspopup="true" aria-expanded="false">
+          <i class="material-icons">more_vert</i>
+        </button>
+        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="profileDropdown">
+          <button id="profileEditButton" class="dropdown-item" type="button">Edit Profile</button>
+          <button id="signOutButton" class="dropdown-item" type="button">Sign Out</button>
+        </div>
+      </div>
+    </div>
+
+    <h6 id="profileCarInfo">Car: 6 Seat Dodge Caravan<h6>
+        <h6 id="profilePhoneNumber">Phone Number: 123-456-7890</h6>
+        <h6><img
+            src="https://images.ctfassets.net/gkyt4bl1j2fs/ym6BkLqyGjMBmiCwtM7AW/829bf561ea771c00839b484cb8edeebb/App_Icon.png?w=276&h=276&q=50&fm=png&bg=transparent"
+            id="venmoLogo"> @JohnDoeVenmo</h6>
+        <h6><img
+            src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSkPkkIBTYCgbLrhPxDHhsYtaj-aLE-gWjZ8A&usqp=CAU"
+            id="cashAppLogo"> @JohnDoeCashApp</h6>
+
+        <h6 class="text-muted hr-text">Current Rides</h6>
+        <hr>
+
+        <div class="list-container" id=""></div>
+
+
+  </div>
+
+  <div class="navbar bottom-nav fixed-bottom">
+    <a class="nav-link" href="/home.html"><i class="material-icons">home</i>
+      <div>Home</div>
+    </a>
+    <a class="nav-link" href="/requests.html"><i class="material-icons">emoji_people</i>
+      <div>Requests</div>
+    </a>
+    <a class="nav-link" href="/offers.html"><i class="material-icons">directions_car</i>
+      <div>Offers</div>
+    </a>
+    <a class="nav-link active" href="/profile.html"><i class="material-icons">account_circle</i>
+      <div>Profile</div>
+    </a>
+  </div>
+  <script src="scripts/jquery.min.js"></script>
+  <script src="scripts/popper.js"></script>
+  <script src="scripts/bootstrap-material-design.js"></script>
+  <script>
+    $("body").bootstrapMaterialDesign();
+  </script>
+  <script src="/__/firebase/7.18.0/firebase-app.js"></script>
+  <script src="/__/firebase/7.18.0/firebase-analytics.js"></script>
+  <script src="/__/firebase/7.18.0/firebase-auth.js"></script>
+  <script src="/__/firebase/7.18.0/firebase-firestore.js"></script>
+  <script src="scripts/rosefire.min.js"></script>
+  <script src="/__/firebase/init.js"></script>
+  <script src="scripts/main.js"></script>
+</body>
+
+</html>
