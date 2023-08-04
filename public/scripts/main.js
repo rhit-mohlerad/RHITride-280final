@@ -700,6 +700,9 @@ rhit.FbAuthManager = class {
 
 rhit.initializePage = function () {
 	const urlParams = new URLSearchParams(window.location.search);
+	const profileButtons = document.querySelectorAll(".profile-button");
+	profileButtons.forEach(link => link.href += `?id=${rhit.fbAuthManager.uid}`);
+
 	if (document.querySelector("#loginPage")) {
 		console.log("login page");
 		new rhit.LoginPageController();
@@ -711,7 +714,7 @@ rhit.initializePage = function () {
 
 	if (document.querySelector("#profilePage")) {
 		console.log("profile page");
-		const uid = urlParams.get("uid");
+		const uid = urlParams.get("id");
 		rhit.fbRequestsManager = new rhit.FbRequestsManager(uid);
 		rhit.fbOffersManager = new rhit.FbOffersManager(uid);
 		new rhit.ProfilePageController();
@@ -750,6 +753,8 @@ rhit.checkForRedirects = function () {
 	if (!document.querySelector("#loginPage") && !rhit.fbAuthManager.isSignedIn) {
 		window.location.href = "/";
 	}
+
+	
 };
 
 
