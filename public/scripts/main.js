@@ -758,6 +758,17 @@ rhit.checkForRedirects = function () {
 };
 
 
+//----------------------------- Google Maps API -----------------------------
+function initMap() {
+	new google.maps.Map(document.getElementById("map"), {
+	  mapId: "6cd56b6d055b9278",
+	  center: { lat: 39.4827, lng: -87.3240},
+	  zoom: 15,
+	});
+  }
+  
+  window.initMap = initMap;
+
 /* Main */
 /** function and class syntax examples */
 rhit.main = function () {

@@ -339,6 +339,11 @@ div.dollar-sign:after {
     color: green;
 }
 
+#map {
+    height: 60vh;
+    border-radius: 10px;
+}
+
 @media (min-width: 768px) {
     .bottom-nav {
         display: none;

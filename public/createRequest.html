@@ -32,6 +32,8 @@
       <input type="text" class="form-control" id="destinationLocation">
     </div>
 
+    <div id="map"></div>
+
     <div class="create-heading">Time</div>
     <label for="request-start-time">Enter a departure time:</label>
     <input type="datetime-local" id="request-start-time" name="request-start-time" value="2018-06-12T19:30"
@@ -65,6 +67,7 @@
     <i class="material-icons">chevron_left</i>Submit
   </button>
 
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
   <script src="scripts/jquery.min.js"></script>
   <script src="scripts/popper.js"></script>
   <script src="scripts/bootstrap-material-design.js"></script>
@@ -77,6 +80,10 @@
   <script src="/__/firebase/7.18.0/firebase-firestore.js"></script>
   <script src="/__/firebase/init.js"></script>
   <script src="scripts/main.js"></script>
+  <script
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAr4FD9HA_rd7Hvv_b-zSU85_95UJm752M&map_ids=6cd56b6d055b9278&callback=initMap"
+      defer
+    ></script>
 </body>
 
 </html>
