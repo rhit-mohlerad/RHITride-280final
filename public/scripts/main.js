@@ -761,6 +761,8 @@ rhit.checkForRedirects = function () {
 //----------------------------- Google Maps API -----------------------------
 let map;
 let markers = [];
+let directionsService;
+let directionsRenderer;
 
 const startingLocationInput = document.getElementById("startingLocation");
 const destinationLocationInput = document.getElementById("destinationLocation");
@@ -774,6 +776,10 @@ function initMap() {
 	  center: { lat: 39.4827, lng: -87.3240},
 	  zoom: 15,
 	});
+
+	directionsService = new google.maps.DirectionsService();
+  	directionsRenderer = new google.maps.DirectionsRenderer();
+  	directionsRenderer.setMap(map);
   }
 
   function addMarkerFromForm(inputId) {
@@ -811,6 +817,32 @@ function initMap() {
   
 	// Fit the map's viewport to the bounds of all markers
 	map.fitBounds(bounds);
+  
+	// Check if both starting point and destination markers are present
+	if (markers.length === 2) {
+	  calculateAndDisplayRoute();
+	}
+  }
+
+  function calculateAndDisplayRoute() {
+	const startMarker = markers[0];
+	const destinationMarker = markers[1];
+  
+	const request = {
+	  origin: startMarker.getPosition(),
+	  destination: destinationMarker.getPosition(),
+	  travelMode: google.maps.TravelMode.DRIVING,
+	};
+  
+	// Call the Directions Service to get the route
+	directionsService.route(request, (result, status) => {
+	  if (status === "OK") {
+		// Display the route on the map using Directions Renderer
+		directionsRenderer.setDirections(result);
+	  } else {
+		console.log("Directions request failed due to " + status);
+	  }
+	});
   }
   
 window.initMap = initMap;
