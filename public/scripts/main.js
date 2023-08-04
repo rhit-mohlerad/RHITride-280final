@@ -455,7 +455,7 @@ rhit.RequestDetailPageController = class {
 				minute: '2-digit'
 			})}`;
 			if (rhit.fbSingleRequestManager.endTime) {
-				document.querySelector(".ride-type").innerHTML =  `Round-Trip`;
+				document.querySelector(".ride-type").innerHTML = `Round-Trip`;
 				document.querySelector(".detail-return").innerHTML = `Return Time: ${rhit.fbSingleRequestManager.endTime.toDate().toLocaleDateString('en-us', {
 					weekday: "long",
 					month: "long",
@@ -641,6 +641,27 @@ rhit.FbAuthManager = class {
 	}
 	beginListening(changeListener) {
 		firebase.auth().onAuthStateChanged((user) => {
+			//im pretty sure this is really inefficient cause it seems to run every time i change the page, but this is the only way I can get new users' documents to show up.
+			if (user) {
+				const userRef = firebase.firestore().collection(rhit.FB_COLLECTION_USERS).doc(user.uid);
+				userRef.get().then((doc) => {
+					if (!doc.exists) {
+						// User document doesn't exist, create a new user document
+						userRef.set({
+							displayName: user.displayName,
+							// Add other user properties as needed
+						}).then(() => {
+							console.log("New user document created!");
+						}).catch((error) => {
+							console.error("Error creating user document:", error);
+						});
+					} else {
+						console.log("user already exists.");
+					}
+				}).catch((error) => {
+					console.error("Error checking user document:", error);
+				});
+			}
 			this._user = user;
 			changeListener();
 		});
@@ -652,7 +673,6 @@ rhit.FbAuthManager = class {
 				return;
 			}
 			console.log("Rosefire success!", rfUser);
-
 			firebase.auth().signInWithCustomToken(rfUser.token).catch((error) => {
 				const errorCode = error.code;
 				const errorMessage = error.message;
