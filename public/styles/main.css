@@ -342,6 +342,7 @@ div.dollar-sign:after {
 #map {
     height: 60vh;
     border-radius: 10px;
+    margin-bottom: 20px;
 }
 
 @media (min-width: 768px) {

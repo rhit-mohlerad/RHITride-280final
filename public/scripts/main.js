@@ -759,15 +759,65 @@ rhit.checkForRedirects = function () {
 
 
 //----------------------------- Google Maps API -----------------------------
+let map;
+let markers = [];
+
+const startingLocationInput = document.getElementById("startingLocation");
+const destinationLocationInput = document.getElementById("destinationLocation");
+
+startingLocationInput.addEventListener("blur", () => addMarkerFromForm("startingLocation"));
+destinationLocationInput.addEventListener("blur", () => addMarkerFromForm("destinationLocation"));
+
 function initMap() {
-	new google.maps.Map(document.getElementById("map"), {
+	map = new google.maps.Map(document.getElementById("map"), {
 	  mapId: "6cd56b6d055b9278",
 	  center: { lat: 39.4827, lng: -87.3240},
 	  zoom: 15,
 	});
   }
+
+  function addMarkerFromForm(inputId) {
+    const input = document.getElementById(inputId).value;
+    geocodeAddress(input);
+  }
+
+  function geocodeAddress(location) {
+    const geocoder = new google.maps.Geocoder();
+    geocoder.geocode({ address: location }, (results, status) => {
+      if (status === "OK") {
+        const latitude = results[0].geometry.location.lat();
+        const longitude = results[0].geometry.location.lng();
+        const latLng = { lat: latitude, lng: longitude };
+        addMarker(latLng);
+      } else {
+		console.log("Geocode was not successful for the following reason: " + status);
+		return;
+      }
+    });
+  }
+
+  function addMarker(latLng) {
+	const marker = new google.maps.Marker({
+	  position: latLng,
+	  map: map,
+	});
+	markers.push(marker);
   
-  window.initMap = initMap;
+	// Create a LatLngBounds object to encompass all markers
+	const bounds = new google.maps.LatLngBounds();
+	for (const marker of markers) {
+	  bounds.extend(marker.getPosition());
+	}
+  
+	// Fit the map's viewport to the bounds of all markers
+	map.fitBounds(bounds);
+  }
+  
+window.initMap = initMap;
+
+
+
+
 
 /* Main */
 /** function and class syntax examples */
