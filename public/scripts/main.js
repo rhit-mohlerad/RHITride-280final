@@ -419,6 +419,11 @@ rhit.CreateRequestPageController = class {
 			const comment = document.querySelector("#requestAdditionalComments").value;
 			rhit.fbRequestsManager.add(requester, startTime, endTime, payment, start, dest, comment);
 		}
+		const startingLocationInput = document.getElementById("startingLocation");
+		const destinationLocationInput = document.getElementById("destinationLocation");
+
+		startingLocationInput.addEventListener("blur", () => addMarkerFromForm("startingLocation"));
+		destinationLocationInput.addEventListener("blur", () => addMarkerFromForm("destinationLocation"));
 	}
 }
 
@@ -764,11 +769,11 @@ let markers = [];
 let directionsService;
 let directionsRenderer;
 
-const startingLocationInput = document.getElementById("startingLocation");
-const destinationLocationInput = document.getElementById("destinationLocation");
+// const startingLocationInput = document.getElementById("startingLocation");
+// const destinationLocationInput = document.getElementById("destinationLocation");
 
-startingLocationInput.addEventListener("blur", () => addMarkerFromForm("startingLocation"));
-destinationLocationInput.addEventListener("blur", () => addMarkerFromForm("destinationLocation"));
+// startingLocationInput.addEventListener("blur", () => addMarkerFromForm("startingLocation"));
+// destinationLocationInput.addEventListener("blur", () => addMarkerFromForm("destinationLocation"));
 
 function initMap() {
 	map = new google.maps.Map(document.getElementById("map"), {
@@ -843,6 +848,7 @@ function initMap() {
 		console.log("Directions request failed due to " + status);
 	  }
 	});
+	//Potential TODO: When another address is input (when the form is changed), a third marker
   }
   
 window.initMap = initMap;
