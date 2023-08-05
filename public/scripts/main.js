@@ -849,7 +849,7 @@ function initMap() {
 	  }
 	});
 	//Potential TODO: When another address is input (when the form is changed), a third marker is created, maybe figure out a way to remove current 
-	//markers when the address is changed
+	//markers when the address is changed so there are only two markers in the array
   }
 
   
