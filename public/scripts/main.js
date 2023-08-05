@@ -848,8 +848,10 @@ function initMap() {
 		console.log("Directions request failed due to " + status);
 	  }
 	});
-	//Potential TODO: When another address is input (when the form is changed), a third marker
+	//Potential TODO: When another address is input (when the form is changed), a third marker is created, maybe figure out a way to remove current 
+	//markers when the address is changed
   }
+
   
 window.initMap = initMap;
 
