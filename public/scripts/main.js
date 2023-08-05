@@ -819,9 +819,14 @@ function initMap() {
 	for (const marker of markers) {
 	  bounds.extend(marker.getPosition());
 	}
+	map.setZoom(15);
   
 	// Fit the map's viewport to the bounds of all markers
 	map.fitBounds(bounds);
+
+	if (markers.length === 1) {
+		map.setZoom(17);
+	  }
   
 	// Check if both starting point and destination markers are present
 	if (markers.length === 2) {
