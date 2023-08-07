@@ -362,6 +362,56 @@ div.dollar-sign:after {
     display: none;
 }
 
+.profileForms {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column; 
+    height: 100vh;
+  }
+
+#profileBody {
+    background: #800000;
+    font-family: 'Poppins', sans-serif;
+}
+
+.inputBox {
+    display: block; 
+    margin-bottom: 10px; 
+    position: relative;
+    width: 250px;
+}
+
+.inputBox input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid white;
+    background: #800000;
+    border-radius: 7px;
+    outline: none;
+    color: white;
+    font-size: 1em;
+}
+
+.inputBox span {
+    left: 0;
+    padding: 10px;
+    /* pointer-events: none;
+    font-size: 1em;
+    color: white;
+    text-transform: uppercase;
+    transition: 0.5s; */
+}
+
+/* .inputBox input:valid ~ span,
+.inputBox input:focus ~span {
+    color: lightgrey;
+    transform: translateX(10px) translateY(-7px);
+    font-size: 0.65em;
+    padding: 0 10px;
+    background: #800000;
+} */
+
 
 @media (min-width: 768px) {
     .bottom-nav {
