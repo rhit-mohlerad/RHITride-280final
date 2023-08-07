@@ -44,7 +44,7 @@ rhit.Request = class {
 
 //Class for making Offer objects
 rhit.Offer = class {
-	constructor(id, driver, startTime, endTime, price, start, dest, comment, seats) {
+	constructor(id, driver, startTime, endTime, price, start, dest, comment, seats, riders) {
 		this.id = id;
 		this.driver = driver;
 		this.startTime = startTime;
@@ -54,7 +54,7 @@ rhit.Offer = class {
 		this.dest = dest;
 		this.comment = comment;
 		this.seats = seats;
-		this.riders = [];
+		this.riders = riders;
 	}
 }
 
@@ -395,7 +395,50 @@ rhit.ProfilePageController = class {
 }
 
 rhit.CreateRequestPageController = class {
-	constructor() {
+	constructor(reqId) {
+		if (reqId) {
+			rhit.fbSingleRequestManager.beginListening(() => {
+				document.querySelector("#startingLocation").value = rhit.fbSingleRequestManager.start;
+				document.querySelector("#destinationLocation").value = rhit.fbSingleRequestManager.dest;
+				document.querySelector("#request-start-time").value = moment(rhit.fbSingleRequestManager.startTime.toDate()).format('YYYY-MM-DDTHH:mm:ss');
+				if (rhit.fbSingleRequestManager.endTime) {
+					document.querySelector("#roundTripCheck").checked = true;
+					document.querySelector(".hide-on-click").style.display = "block";
+					document.querySelector("#request-return-time").disabled = false;
+					document.querySelector("#request-return-time").value = moment(rhit.fbSingleRequestManager.endTime.toDate()).format('YYYY-MM-DDTHH:mm:ss');
+				}
+				document.querySelector("#requestMoneyInput").value = rhit.fbSingleRequestManager.payment;
+				document.querySelector("#requestAdditionalComments").value = rhit.fbSingleRequestManager.comment;
+			});
+			console.log(rhit.fbSingleRequestManager);
+
+			document.querySelector("#submitRequestButton").onclick = (event) => {
+				const startTime = new Date(document.querySelector("#request-start-time").value);
+				let endTime = null;
+				if (document.querySelector("#roundTripCheck").checked) {
+					endTime = new Date(document.querySelector("#request-return-time").value);
+				}
+				const payment = parseInt(document.querySelector("#requestMoneyInput").value);
+				const start = document.querySelector("#startingLocation").value;
+				const dest = document.querySelector("#destinationLocation").value;
+				const comment = document.querySelector("#requestAdditionalComments").value;
+				rhit.fbSingleRequestManager.update(startTime, endTime, payment, start, dest, comment);
+			}
+		} else {
+			document.querySelector("#submitRequestButton").onclick = (event) => {
+				const requester = rhit.fbAuthManager.uid;
+				const startTime = new Date(document.querySelector("#request-start-time").value);
+				let endTime = null;
+				if (document.querySelector("#roundTripCheck").checked) {
+					endTime = new Date(document.querySelector("#request-return-time").value);
+				}
+				const payment = parseInt(document.querySelector("#requestMoneyInput").value);
+				const start = document.querySelector("#startingLocation").value;
+				const dest = document.querySelector("#destinationLocation").value;
+				const comment = document.querySelector("#requestAdditionalComments").value;
+				rhit.fbRequestsManager.add(requester, startTime, endTime, payment, start, dest, comment);
+			}
+		}
 		document.querySelector("#roundTripCheck").onclick = (event) => {
 			if (document.querySelector("#roundTripCheck").checked) {
 				document.querySelector(".hide-on-click").style.display = "block";
@@ -404,20 +447,6 @@ rhit.CreateRequestPageController = class {
 				document.querySelector(".hide-on-click").style.display = "none";
 				document.querySelector("#request-return-time").disabled = true;
 			}
-		}
-
-		document.querySelector("#submitRequestButton").onclick = (event) => {
-			const requester = rhit.fbAuthManager.uid;
-			const startTime = new Date(document.querySelector("#request-start-time").value);
-			let endTime = null;
-			if (document.querySelector("#roundTripCheck").checked) {
-				endTime = new Date(document.querySelector("#request-return-time").value);
-			}
-			const payment = parseInt(document.querySelector("#requestMoneyInput").value);
-			const start = document.querySelector("#startingLocation").value;
-			const dest = document.querySelector("#destinationLocation").value;
-			const comment = document.querySelector("#requestAdditionalComments").value;
-			rhit.fbRequestsManager.add(requester, startTime, endTime, payment, start, dest, comment);
 		}
 		const startingLocationInput = document.getElementById("startingLocation");
 		const destinationLocationInput = document.getElementById("destinationLocation");
@@ -435,6 +464,10 @@ rhit.RequestDetailPageController = class {
 
 	async updateView() {
 		if (rhit.fbSingleRequestManager.requester == rhit.fbAuthManager.uid) {
+			document.querySelector("#requestDetailDropdown").style.display = "block";
+			document.querySelector("#requestEditButton").onclick = (event) => {
+				window.location.href = `/createRequest.html?id=${rhit.fbSingleRequestManager.id}`
+			}
 			const button = document.querySelector("#requestDetailActionButton");
 			button.innerHTML = "Cancel Request";
 			button.onclick = (event) => {
@@ -445,7 +478,29 @@ rhit.RequestDetailPageController = class {
 					console.error("Error removing document: ", error);
 				});;
 			}
-			this._ref = await firebase.firestore().collection(rhit.FB_COLLECTION_USERS).doc(rhit.fbSingleRequestManager.requester).get()
+		} else {
+			const button = document.querySelector("#requestDetailActionButton");
+			button.innerHTML = "Offer Ride";
+			button.onclick = (event) => {
+				const driver = rhit.fbAuthManager.uid;
+				const startTime = rhit.fbSingleRequestManager.startTime;
+				const endTime = rhit.fbSingleRequestManager.endTime;
+				const price = rhit.fbSingleRequestManager.payment;
+				const start = rhit.fbSingleRequestManager.start;
+				const dest = rhit.fbSingleRequestManager.dest;
+				const comment = ""; //figure out later
+				const seats = 5; //figure out later
+				const riders = [rhit.fbSingleRequestManager.requester];
+				console.log(driver, startTime, endTime, price, start, dest, riders);
+				rhit.fbOffersManager.add(driver, startTime, endTime, price, start, dest, comment, seats, riders);
+				rhit.fbSingleRequestManager.delete().then(() => {
+					console.log("Document successfully deleted!");
+				}).catch((error) => {
+					console.error("Error removing document: ", error);
+				});
+			}
+		}
+		this._ref = await firebase.firestore().collection(rhit.FB_COLLECTION_USERS).doc(rhit.fbSingleRequestManager.requester).get()
 			const _requester = this._ref.data();
 			document.querySelector(".detail-username").innerHTML = `${_requester.displayName}'s Request`;
 			document.querySelector(".detail-pfp").src = _requester.profilePic;
@@ -470,7 +525,6 @@ rhit.RequestDetailPageController = class {
 				})}`;
 			}
 			document.querySelector(".detail-value").innerHTML = `$${rhit.fbSingleRequestManager.payment}`;
-		}
 	};
 }
 
@@ -537,6 +591,7 @@ rhit.FbRequestsManager = class {
 
 rhit.FbSingleRequestManager = class {
 	constructor(requestId) {
+		this._id = requestId;
 		this._documentSnapshot = {};
 		this._ref = firebase.firestore().collection(rhit.FB_COLLECTION_REQUESTS).doc(requestId);
 	}
@@ -553,8 +608,30 @@ rhit.FbSingleRequestManager = class {
 		});
 	}
 
+	update(startTime, endTime, payment, start, dest, comment) {
+		this._ref.update({
+			["startTime"]: startTime,
+			["endTime"]: endTime,
+			["payment"]: payment,
+			["start"]: start,
+			["dest"]: dest,
+			["comment"]: comment,
+		})
+		.then(() => {
+			console.log("Document successfully updated");
+			window.location.href = `/requestDetails.html?id=${this._id}`
+		})
+		.catch(function(error) {
+			console.log("Error updating document: ", error);
+		});
+	}
+
 	delete() {
 		return this._ref.delete();
+	}
+
+	get id() {
+		return this._id;
 	}
 
 	get requester() {
@@ -602,6 +679,7 @@ rhit.FbOffersManager = class {
 			})
 			.then(function (docRef) {
 				console.log("Document written with ID: ", docRef.id);
+				window.location.href = `/offerDetails.html?id=${docRef.id}`
 			})
 			.catch(function (error) {
 				console.error("Error adding document: ", error);
@@ -733,14 +811,19 @@ rhit.initializePage = function () {
 	if (document.querySelector("#requestDetailPage")) {
 		console.log("requests detail page");
 		const reqId = urlParams.get("id");
+		rhit.fbOffersManager = new rhit.FbOffersManager();
 		rhit.fbSingleRequestManager = new rhit.FbSingleRequestManager(reqId);
 		new rhit.RequestDetailPageController();
 	}
 
 	if (document.querySelector("#createRequestPage")) {
 		console.log("create requests page");
+		const reqId = urlParams.get("id");
 		rhit.fbRequestsManager = new rhit.FbRequestsManager();
-		new rhit.CreateRequestPageController();
+		if (reqId) {
+			rhit.fbSingleRequestManager = new rhit.FbSingleRequestManager(reqId);
+		}
+		new rhit.CreateRequestPageController(reqId);
 	}
 
 	if (document.querySelector("#offersPage")) {
@@ -753,6 +836,7 @@ rhit.initializePage = function () {
 rhit.checkForRedirects = function () {
 	if (document.querySelector("#loginPage") && rhit.fbAuthManager.isSignedIn) {
 		window.location.href = "/home.html";
+		//check if user fields exist; otherwise redirect to profile edit page
 	}
 
 	if (!document.querySelector("#loginPage") && !rhit.fbAuthManager.isSignedIn) {
