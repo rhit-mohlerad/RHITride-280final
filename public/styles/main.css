@@ -362,6 +362,33 @@ div.dollar-sign:after {
     display: none;
 }
 
+#uploadPhotoLabel {
+    display: block;
+    margin: 20px auto;
+    color: white;
+    background: #800000;
+    font-size: 1.1em;
+    padding: 10px 30px;
+    border-radius: 5px;
+    border: 1px solid white;
+    cursor: pointer;
+}
+
+#uploadPhotoLabel:active {
+    transform: translateY(2px);
+    opacity: 0.8;
+}
+
+#input-file {
+    display: none;
+}
+
+#myPicture {
+    width: 220px;
+    height: 220px;
+    border-radius: 50%;
+}
+
 .profileForms {
     display: flex;
     justify-content: center;
@@ -393,18 +420,19 @@ div.dollar-sign:after {
     font-size: 1em;
 }
 
+/* TODO: Maybe figure out some text/click transitions */
 .inputBox span {
-    left: 0;
-    padding: 10px;
-    /* pointer-events: none;
+    /* left: 0;
+    padding: 10px; */
+    color: white;
+    /* pointer-events: none; */
     font-size: 1em;
     color: white;
-    text-transform: uppercase;
-    transition: 0.5s; */
+    /* transition: 0.5s; */
 }
 
 /* .inputBox input:valid ~ span,
-.inputBox input:focus ~span {
+.inputBox input:focus ~ span {
     color: lightgrey;
     transform: translateX(10px) translateY(-7px);
     font-size: 0.65em;
