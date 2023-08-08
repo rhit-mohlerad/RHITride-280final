@@ -393,8 +393,9 @@ div.dollar-sign:after {
     display: flex;
     justify-content: center;
     align-items: center;
-    flex-direction: column; 
+    flex-direction: column;
     height: 100vh;
+    gap: 30px;
   }
 
 #profileBody {
@@ -422,23 +423,24 @@ div.dollar-sign:after {
 
 /* TODO: Maybe figure out some text/click transitions */
 .inputBox span {
-    /* left: 0;
-    padding: 10px; */
+    position: absolute;
+    left: 0;
+    padding: 10px;
     color: white;
-    /* pointer-events: none; */
+    pointer-events: none;
     font-size: 1em;
     color: white;
-    /* transition: 0.5s; */
+    transition: 0.5s;
 }
 
-/* .inputBox input:valid ~ span,
+.inputBox input:valid ~ span,
 .inputBox input:focus ~ span {
     color: lightgrey;
     transform: translateX(10px) translateY(-7px);
     font-size: 0.65em;
     padding: 0 10px;
     background: #800000;
-} */
+}
 
 
 @media (min-width: 768px) {
