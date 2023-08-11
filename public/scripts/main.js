@@ -17,6 +17,7 @@ rhit.fbAuthManager = null;
 rhit.fbOffersManager = null;
 rhit.fbRequestsManager = null;
 rhit.fbSingleRequestManager = null;
+rhit.fbSingleOfferManager = null;
 
 // from: https://stackoverflow.com/questions/494143/creating-a-new-dom-element-from-an-html-string-using-built-in-dom-methods-or-pro/35385518#35385518
 function htmlToElement(html) {
@@ -498,7 +499,9 @@ rhit.CreateOfferPageController = class {
 				const start = document.querySelector("#startingLocation").value;
 				const dest = document.querySelector("#destinationLocation").value;
 				const comment = document.querySelector("#additionalComments").value;
-				rhit.fbOffersManager.add(driver, startTime, endTime, price, start, dest, comment);
+				const seats = 5; // placeholder values
+				const riders = 0;
+				rhit.fbOffersManager.add(driver, startTime, endTime, price, start, dest, comment, seats, riders);
 			}
 		}
 		document.querySelector("#roundTripCheck").onclick = (event) => {
