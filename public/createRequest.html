@@ -23,13 +23,13 @@
       <label for="startingLocation" class="bmd-label-floating"><span class="material-icons">
           adjust
         </span>Choose starting point</label>
-      <input type="text" class="form-control" id="startingLocation" autocomplete="off">
+      <input type="text" class="form-control" id="startingLocation">
     </div>
     <div class="form-group">
       <label for="destinationLocation" class="bmd-label-floating"><span class="material-icons">
           place
         </span>Choose destination</label>
-      <input type="text" class="form-control" id="destinationLocation" autocomplete="off">
+      <input type="text" class="form-control" id="destinationLocation">
     </div>
 
     <div id="map"></div>
@@ -82,8 +82,8 @@
   <script src="/__/firebase/init.js"></script>
   <script src="scripts/main.js"></script>
   <script
-      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAr4FD9HA_rd7Hvv_b-zSU85_95UJm752M&map_ids=6cd56b6d055b9278&callback=initMap"
-      defer
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAr4FD9HA_rd7Hvv_b-zSU85_95UJm752M&map_ids=6cd56b6d055b9278&libraries=places&callback=initMap"
+      async defer
     ></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
 </body>

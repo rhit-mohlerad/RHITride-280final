@@ -886,11 +886,52 @@ function initMap() {
 	directionsService = new google.maps.DirectionsService();
   	directionsRenderer = new google.maps.DirectionsRenderer();
   	directionsRenderer.setMap(map);
+
+	// Enable Places API Autocomplete on starting and destination input fields
+	const startingLocationInput = document.getElementById("startingLocation");
+	const destinationLocationInput = document.getElementById("destinationLocation");
+  
+	const autocompleteOptions = {
+	  types: ["geocode"],
+	};
+  
+	const startingLocationAutocomplete = new google.maps.places.Autocomplete(
+	  startingLocationInput,
+	  autocompleteOptions
+	);
+  
+	const destinationLocationAutocomplete = new google.maps.places.Autocomplete(
+	  destinationLocationInput,
+	  autocompleteOptions
+	);
+  
+	// Add event listeners for place_changed event on Autocomplete
+	//The place_changed event means you clicked something from the autocomplete dropdown
+	startingLocationAutocomplete.addListener("place_changed", () => {
+	  const place = startingLocationAutocomplete.getPlace();
+	  if (place.geometry) {
+		addMarkerFromAutocomplete(place);
+	  }
+	});
+  
+	destinationLocationAutocomplete.addListener("place_changed", () => {
+	  const place = destinationLocationAutocomplete.getPlace();
+	  if (place.geometry) {
+		addMarkerFromAutocomplete(place);
+	  }
+	});
   }
 
   function addMarkerFromForm(inputId) {
     const input = document.getElementById(inputId).value;
     geocodeAddress(input);
+  }
+
+  //in the case of autocomplete, there's no need to read from the html IDs (startingLocation and 
+  //destinationLocation because the getPlace() method takes care of that
+  function addMarkerFromAutocomplete(place) {
+	console.log(place);
+    geocodeAddress(place);
   }
 
   function geocodeAddress(location) {
