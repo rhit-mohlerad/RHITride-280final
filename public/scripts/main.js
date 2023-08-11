@@ -456,6 +456,68 @@ rhit.CreateRequestPageController = class {
 	}
 }
 
+rhit.CreateOfferPageController = class {
+	constructor(offerId) {
+		if (offerId) {
+			rhit.fbSingleOfferManager.beginListening(() => {
+				document.querySelector("#startingLocation").value = rhit.fbSingleOfferManager.start;
+				document.querySelector("#destinationLocation").value = rhit.fbSingleOfferManager.dest;
+				document.querySelector("#startTime").value = moment(rhit.fbSingleOfferManager.startTime.toDate()).format('YYYY-MM-DDTHH:mm:ss');
+				if (rhit.fbSingleOfferManager.endTime) {
+					document.querySelector("#roundTripCheck").checked = true;
+					document.querySelector(".hide-on-click").style.display = "block";
+					document.querySelector("#returnTime").disabled = false;
+					document.querySelector("#returnTime").value = moment(rhit.fbSingleOfferManager.endTime.toDate()).format('YYYY-MM-DDTHH:mm:ss');
+				}
+				document.querySelector("#moneyInput").value = rhit.fbSingleOfferManager.price;
+				document.querySelector("#additionalComments").value = rhit.fbSingleOfferManager.comment;
+			});
+			console.log(rhit.fbSingleOfferManager);
+
+			document.querySelector("#submitButton").onclick = (event) => {
+				const startTime = new Date(document.querySelector("#startTime").value);
+				let endTime = null;
+				if (document.querySelector("#roundTripCheck").checked) {
+					endTime = new Date(document.querySelector("#returnTime").value);
+				}
+				const price = parseInt(document.querySelector("#moneyInput").value);
+				const start = document.querySelector("#startingLocation").value;
+				const dest = document.querySelector("#destinationLocation").value;
+				const comment = document.querySelector("#additionalComments").value;
+				rhit.fbSingleOfferManager.update(startTime, endTime, price, start, dest, comment);
+			}
+		} else {
+			document.querySelector("#submitButton").onclick = (event) => {
+				const driver = rhit.fbAuthManager.uid;
+				const startTime = new Date(document.querySelector("#startTime").value);
+				let endTime = null;
+				if (document.querySelector("#roundTripCheck").checked) {
+					endTime = new Date(document.querySelector("#returnTime").value);
+				}
+				const price = parseInt(document.querySelector("#moneyInput").value);
+				const start = document.querySelector("#startingLocation").value;
+				const dest = document.querySelector("#destinationLocation").value;
+				const comment = document.querySelector("#additionalComments").value;
+				rhit.fbOffersManager.add(driver, startTime, endTime, price, start, dest, comment);
+			}
+		}
+		document.querySelector("#roundTripCheck").onclick = (event) => {
+			if (document.querySelector("#roundTripCheck").checked) {
+				document.querySelector(".hide-on-click").style.display = "block";
+				document.querySelector("#returnTime").disabled = false;
+			} else {
+				document.querySelector(".hide-on-click").style.display = "none";
+				document.querySelector("#returnTime").disabled = true;
+			}
+		}
+		const startingLocationInput = document.getElementById("startingLocation");
+		const destinationLocationInput = document.getElementById("destinationLocation");
+
+		startingLocationInput.addEventListener("blur", () => addMarkerFromForm("startingLocation"));
+		destinationLocationInput.addEventListener("blur", () => addMarkerFromForm("destinationLocation"));
+	}
+}
+
 rhit.RequestDetailPageController = class {
 	constructor() {
 		rhit.fbSingleRequestManager.beginListening(this.updateView.bind(this));
@@ -501,30 +563,30 @@ rhit.RequestDetailPageController = class {
 			}
 		}
 		this._ref = await firebase.firestore().collection(rhit.FB_COLLECTION_USERS).doc(rhit.fbSingleRequestManager.requester).get()
-			const _requester = this._ref.data();
-			document.querySelector(".detail-username").innerHTML = `${_requester.displayName}'s Request`;
-			document.querySelector(".detail-pfp").src = _requester.profilePic;
-			document.querySelector(".ride-type").innerHTML = `Drop-Off Only`;
-			document.querySelector(".detail-from").innerHTML = `From: ${rhit.fbSingleRequestManager.start}`;
-			document.querySelector(".detail-to").innerHTML = `To: ${rhit.fbSingleRequestManager.dest}`;
-			document.querySelector(".detail-departure").innerHTML = `Departure Time: ${rhit.fbSingleRequestManager.startTime.toDate().toLocaleDateString('en-us', {
+		const _requester = this._ref.data();
+		document.querySelector(".detail-username").innerHTML = `${_requester.displayName}'s Request`;
+		document.querySelector(".detail-pfp").src = _requester.profilePic;
+		document.querySelector(".ride-type").innerHTML = `Drop-Off Only`;
+		document.querySelector(".detail-from").innerHTML = `From: ${rhit.fbSingleRequestManager.start}`;
+		document.querySelector(".detail-to").innerHTML = `To: ${rhit.fbSingleRequestManager.dest}`;
+		document.querySelector(".detail-departure").innerHTML = `Departure Time: ${rhit.fbSingleRequestManager.startTime.toDate().toLocaleDateString('en-us', {
 				weekday: "long",
 				month: "long",
 				day: "numeric",
 				hour: '2-digit',
 				minute: '2-digit'
 			})}`;
-			if (rhit.fbSingleRequestManager.endTime) {
-				document.querySelector(".ride-type").innerHTML = `Round-Trip`;
-				document.querySelector(".detail-return").innerHTML = `Return Time: ${rhit.fbSingleRequestManager.endTime.toDate().toLocaleDateString('en-us', {
+		if (rhit.fbSingleRequestManager.endTime) {
+			document.querySelector(".ride-type").innerHTML = `Round-Trip`;
+			document.querySelector(".detail-return").innerHTML = `Return Time: ${rhit.fbSingleRequestManager.endTime.toDate().toLocaleDateString('en-us', {
 					weekday: "long",
 					month: "long",
 					day: "numeric",
 					hour: '2-digit',
 					minute: '2-digit'
 				})}`;
-			}
-			document.querySelector(".detail-value").innerHTML = `$${rhit.fbSingleRequestManager.payment}`;
+		}
+		document.querySelector(".detail-value").innerHTML = `$${rhit.fbSingleRequestManager.payment}`;
 	};
 }
 
@@ -610,20 +672,20 @@ rhit.FbSingleRequestManager = class {
 
 	update(startTime, endTime, payment, start, dest, comment) {
 		this._ref.update({
-			["startTime"]: startTime,
-			["endTime"]: endTime,
-			["payment"]: payment,
-			["start"]: start,
-			["dest"]: dest,
-			["comment"]: comment,
-		})
-		.then(() => {
-			console.log("Document successfully updated");
-			window.location.href = `/requestDetails.html?id=${this._id}`
-		})
-		.catch(function(error) {
-			console.log("Error updating document: ", error);
-		});
+				["startTime"]: startTime,
+				["endTime"]: endTime,
+				["payment"]: payment,
+				["start"]: start,
+				["dest"]: dest,
+				["comment"]: comment,
+			})
+			.then(() => {
+				console.log("Document successfully updated");
+				window.location.href = `/requestDetails.html?id=${this._id}`
+			})
+			.catch(function (error) {
+				console.log("Error updating document: ", error);
+			});
 	}
 
 	delete() {
@@ -715,6 +777,76 @@ rhit.FbOffersManager = class {
 			docSnapshot.get("riders"),
 		);
 		return offer;
+	}
+}
+
+rhit.FbSingleOfferManager = class {
+	constructor(offerId) {
+		this._id = offerId;
+		this._documentSnapshot = {};
+		this._ref = firebase.firestore().collection(rhit.FB_COLLECTION_OFFERS).doc(offerId);
+	}
+
+	beginListening(changeListener) {
+		this._unsubscribe = this._ref.onSnapshot((doc) => {
+			if (doc.exists) {
+				console.log("Document data: ", doc.data());
+				this._documentSnapshot = doc;
+				changeListener();
+			} else {
+				console.log("No such document!");
+			}
+		});
+	}
+
+	update(startTime, endTime, price, start, dest, comment, seats, riders) {
+		this._ref.update({
+				["startTime"]: startTime,
+				["endTime"]: endTime,
+				["price"]: price,
+				["start"]: start,
+				["dest"]: dest,
+				["comment"]: comment,
+				["seats"]: seats,
+				["riders"]: riders,
+			})
+			.then(() => {
+				console.log("Document successfully updated");
+				window.location.href = `/offerDetails.html?id=${this._id}`
+			})
+			.catch(function (error) {
+				console.log("Error updating document: ", error);
+			});
+	}
+
+	delete() {
+		return this._ref.delete();
+	}
+
+	get id() {
+		return this._id;
+	}
+
+	get driver() {
+		return this._documentSnapshot.get("driver");
+	}
+	get start() {
+		return this._documentSnapshot.get("start");
+	}
+	get dest() {
+		return this._documentSnapshot.get("dest");
+	}
+	get comment() {
+		return this._documentSnapshot.get("comment");
+	}
+	get startTime() {
+		return this._documentSnapshot.get("startTime");
+	}
+	get endTime() {
+		return this._documentSnapshot.get("endTime");
+	}
+	get price() {
+		return this._documentSnapshot.get("price");
 	}
 }
 
@@ -826,6 +958,16 @@ rhit.initializePage = function () {
 		new rhit.CreateRequestPageController(reqId);
 	}
 
+	if (document.querySelector("#createOfferPage")) {
+		console.log("create offers page");
+		const offerId = urlParams.get("id");
+		rhit.fbOffersManager = new rhit.FbOffersManager();
+		if (offerId) {
+			rhit.fbSingleOfferManager = new rhit.FbSingleOfferManager(offerId);
+		}
+		new rhit.CreateOfferPageController(offerId);
+	}
+
 	if (document.querySelector("#offersPage")) {
 		console.log("offers page");
 		rhit.fbOffersManager = new rhit.FbOffersManager();
@@ -843,24 +985,24 @@ rhit.checkForRedirects = function () {
 		window.location.href = "/";
 	}
 
-	
+
 };
 //----------------------------- Profile Picture Upload -----------------------------
 //Mostly rough test code that I will move later into a controller and manager
-window.addEventListener('load', function() {
-	document.querySelector('input[type="file"]').addEventListener('change', function() {
+window.addEventListener('load', function () {
+	document.querySelector('input[type="file"]').addEventListener('change', function () {
 		if (this.files && this.files[0]) {
 			var img = document.querySelector('img');
 			img.onload = () => {
-				URL.revokeObjectURL(img.src);  // no longer needed, free memory
+				URL.revokeObjectURL(img.src); // no longer needed, free memory
 			}
-  
+
 			img.src = URL.createObjectURL(this.files[0]); // set src to blob url
 
 			//write code here to set the firebase database information
 		}
 	});
-  });
+});
 
 
 
@@ -878,128 +1020,136 @@ let directionsRenderer;
 
 function initMap() {
 	map = new google.maps.Map(document.getElementById("map"), {
-	  mapId: "6cd56b6d055b9278",
-	  center: { lat: 39.4827, lng: -87.3240},
-	  zoom: 15,
+		mapId: "6cd56b6d055b9278",
+		center: {
+			lat: 39.4827,
+			lng: -87.3240
+		},
+		zoom: 15,
 	});
 
 	directionsService = new google.maps.DirectionsService();
-  	directionsRenderer = new google.maps.DirectionsRenderer();
-  	directionsRenderer.setMap(map);
+	directionsRenderer = new google.maps.DirectionsRenderer();
+	directionsRenderer.setMap(map);
 
 	// Enable Places API Autocomplete on starting and destination input fields
 	const startingLocationInput = document.getElementById("startingLocation");
 	const destinationLocationInput = document.getElementById("destinationLocation");
-  
+
 	const autocompleteOptions = {
-	  types: ["geocode"],
+		types: ["geocode"],
 	};
-  
+
 	const startingLocationAutocomplete = new google.maps.places.Autocomplete(
-	  startingLocationInput,
-	  autocompleteOptions
+		startingLocationInput,
+		autocompleteOptions
 	);
-  
+
 	const destinationLocationAutocomplete = new google.maps.places.Autocomplete(
-	  destinationLocationInput,
-	  autocompleteOptions
+		destinationLocationInput,
+		autocompleteOptions
 	);
-  
+
 	// Add event listeners for place_changed event on Autocomplete
 	//The place_changed event means you clicked something from the autocomplete dropdown
 	startingLocationAutocomplete.addListener("place_changed", () => {
-	  const place = startingLocationAutocomplete.getPlace();
-	  if (place.geometry) {
-		addMarkerFromAutocomplete(place);
-	  }
+		const place = startingLocationAutocomplete.getPlace();
+		if (place.geometry) {
+			addMarkerFromAutocomplete(place);
+		}
 	});
-  
+
 	destinationLocationAutocomplete.addListener("place_changed", () => {
-	  const place = destinationLocationAutocomplete.getPlace();
-	  if (place.geometry) {
-		addMarkerFromAutocomplete(place);
-	  }
+		const place = destinationLocationAutocomplete.getPlace();
+		if (place.geometry) {
+			addMarkerFromAutocomplete(place);
+		}
 	});
-  }
+}
 
-  function addMarkerFromForm(inputId) {
-    const input = document.getElementById(inputId).value;
-    geocodeAddress(input);
-  }
+function addMarkerFromForm(inputId) {
+	const input = document.getElementById(inputId).value;
+	geocodeAddress(input);
+}
 
-  //in the case of autocomplete, there's no need to read from the html IDs (startingLocation and 
-  //destinationLocation because the getPlace() method takes care of that
-  function addMarkerFromAutocomplete(place) {
+//in the case of autocomplete, there's no need to read from the html IDs (startingLocation and 
+//destinationLocation because the getPlace() method takes care of that
+function addMarkerFromAutocomplete(place) {
 	console.log(place);
-    geocodeAddress(place);
-  }
+	geocodeAddress(place);
+}
 
-  function geocodeAddress(location) {
-    const geocoder = new google.maps.Geocoder();
-    geocoder.geocode({ address: location }, (results, status) => {
-      if (status === "OK") {
-        const latitude = results[0].geometry.location.lat();
-        const longitude = results[0].geometry.location.lng();
-        const latLng = { lat: latitude, lng: longitude };
-        addMarker(latLng);
-      } else {
-		console.log("Geocode was not successful for the following reason: " + status);
-		return;
-      }
-    });
-  }
+function geocodeAddress(location) {
+	const geocoder = new google.maps.Geocoder();
+	geocoder.geocode({
+		address: location
+	}, (results, status) => {
+		if (status === "OK") {
+			const latitude = results[0].geometry.location.lat();
+			const longitude = results[0].geometry.location.lng();
+			const latLng = {
+				lat: latitude,
+				lng: longitude
+			};
+			addMarker(latLng);
+		} else {
+			console.log("Geocode was not successful for the following reason: " + status);
+			return;
+		}
+	});
+}
 
-  function addMarker(latLng) {
+function addMarker(latLng) {
 	const marker = new google.maps.Marker({
-	  position: latLng,
-	  map: map,
+		position: latLng,
+		map: map,
 	});
 	markers.push(marker);
-  
+
 	// Create a LatLngBounds object to encompass all markers
 	const bounds = new google.maps.LatLngBounds();
 	for (const marker of markers) {
-	  bounds.extend(marker.getPosition());
+		bounds.extend(marker.getPosition());
 	}
 	map.setZoom(15);
-  
+
 	// Fit the map's viewport to the bounds of all markers
 	map.fitBounds(bounds);
 
 	if (markers.length === 1) {
 		map.setZoom(17);
-	  }
-  
+	}
+
 	// Check if both starting point and destination markers are present
 	if (markers.length === 2) {
-	  calculateAndDisplayRoute();
+		calculateAndDisplayRoute();
 	}
-  }
+}
 
-  function calculateAndDisplayRoute() {
+function calculateAndDisplayRoute() {
 	const startMarker = markers[0];
 	const destinationMarker = markers[1];
-  
+
 	const request = {
-	  origin: startMarker.getPosition(),
-	  destination: destinationMarker.getPosition(),
-	  travelMode: google.maps.TravelMode.DRIVING,
+		origin: startMarker.getPosition(),
+		destination: destinationMarker.getPosition(),
+		travelMode: google.maps.TravelMode.DRIVING,
 	};
-  
+
 	// Call the Directions Service to get the route
 	directionsService.route(request, (result, status) => {
-	  if (status === "OK") {
-		// Display the route on the map using Directions Renderer
-		directionsRenderer.setDirections(result);
-	  } else {
-		console.log("Directions request failed due to " + status);
-	  }
+		if (status === "OK") {
+			// Display the route on the map using Directions Renderer
+			directionsRenderer.setDirections(result);
+		} else {
+			console.log("Directions request failed due to " + status);
+		}
 	});
 	//Potential TODO: When another address is input (when the form is changed), a third marker is created, maybe figure out a way to remove current 
 	//markers when the address is changed so there are only two markers in the array
-  }
+}
 
-  
+
 window.initMap = initMap;
 
 
