@@ -400,52 +400,52 @@ rhit.CreateRequestPageController = class {
 			rhit.fbSingleRequestManager.beginListening(() => {
 				document.querySelector("#startingLocation").value = rhit.fbSingleRequestManager.start;
 				document.querySelector("#destinationLocation").value = rhit.fbSingleRequestManager.dest;
-				document.querySelector("#request-start-time").value = moment(rhit.fbSingleRequestManager.startTime.toDate()).format('YYYY-MM-DDTHH:mm:ss');
+				document.querySelector("#startTime").value = moment(rhit.fbSingleRequestManager.startTime.toDate()).format('YYYY-MM-DDTHH:mm:ss');
 				if (rhit.fbSingleRequestManager.endTime) {
 					document.querySelector("#roundTripCheck").checked = true;
 					document.querySelector(".hide-on-click").style.display = "block";
-					document.querySelector("#request-return-time").disabled = false;
-					document.querySelector("#request-return-time").value = moment(rhit.fbSingleRequestManager.endTime.toDate()).format('YYYY-MM-DDTHH:mm:ss');
+					document.querySelector("#returnTime").disabled = false;
+					document.querySelector("#returnTime").value = moment(rhit.fbSingleRequestManager.endTime.toDate()).format('YYYY-MM-DDTHH:mm:ss');
 				}
-				document.querySelector("#requestMoneyInput").value = rhit.fbSingleRequestManager.payment;
-				document.querySelector("#requestAdditionalComments").value = rhit.fbSingleRequestManager.comment;
+				document.querySelector("#moneyInput").value = rhit.fbSingleRequestManager.payment;
+				document.querySelector("#additionalComments").value = rhit.fbSingleRequestManager.comment;
 			});
 			console.log(rhit.fbSingleRequestManager);
 
-			document.querySelector("#submitRequestButton").onclick = (event) => {
-				const startTime = new Date(document.querySelector("#request-start-time").value);
+			document.querySelector("#submitButton").onclick = (event) => {
+				const startTime = new Date(document.querySelector("#startTime").value);
 				let endTime = null;
 				if (document.querySelector("#roundTripCheck").checked) {
-					endTime = new Date(document.querySelector("#request-return-time").value);
+					endTime = new Date(document.querySelector("#returnTime").value);
 				}
-				const payment = parseInt(document.querySelector("#requestMoneyInput").value);
+				const payment = parseInt(document.querySelector("#moneyInput").value);
 				const start = document.querySelector("#startingLocation").value;
 				const dest = document.querySelector("#destinationLocation").value;
-				const comment = document.querySelector("#requestAdditionalComments").value;
+				const comment = document.querySelector("#additionalComments").value;
 				rhit.fbSingleRequestManager.update(startTime, endTime, payment, start, dest, comment);
 			}
 		} else {
-			document.querySelector("#submitRequestButton").onclick = (event) => {
+			document.querySelector("#submitButton").onclick = (event) => {
 				const requester = rhit.fbAuthManager.uid;
-				const startTime = new Date(document.querySelector("#request-start-time").value);
+				const startTime = new Date(document.querySelector("#startTime").value);
 				let endTime = null;
 				if (document.querySelector("#roundTripCheck").checked) {
-					endTime = new Date(document.querySelector("#request-return-time").value);
+					endTime = new Date(document.querySelector("#returnTime").value);
 				}
-				const payment = parseInt(document.querySelector("#requestMoneyInput").value);
+				const payment = parseInt(document.querySelector("#moneyInput").value);
 				const start = document.querySelector("#startingLocation").value;
 				const dest = document.querySelector("#destinationLocation").value;
-				const comment = document.querySelector("#requestAdditionalComments").value;
+				const comment = document.querySelector("#additionalComments").value;
 				rhit.fbRequestsManager.add(requester, startTime, endTime, payment, start, dest, comment);
 			}
 		}
 		document.querySelector("#roundTripCheck").onclick = (event) => {
 			if (document.querySelector("#roundTripCheck").checked) {
 				document.querySelector(".hide-on-click").style.display = "block";
-				document.querySelector("#request-return-time").disabled = false;
+				document.querySelector("#returnTime").disabled = false;
 			} else {
 				document.querySelector(".hide-on-click").style.display = "none";
-				document.querySelector("#request-return-time").disabled = true;
+				document.querySelector("#returnTime").disabled = true;
 			}
 		}
 		const startingLocationInput = document.getElementById("startingLocation");

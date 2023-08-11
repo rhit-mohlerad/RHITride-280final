@@ -20,13 +20,13 @@
     <div class="create-heading">Location</div>
 
     <div class="form-group">
-      <label for="startingLocation" class="bmd-label-floating"><span class="material-icons">
+      <label for="startingLocation" class="location-form-label"><span class="material-icons">
           adjust
         </span>Choose starting point</label>
       <input type="text" class="form-control" id="startingLocation">
     </div>
     <div class="form-group">
-      <label for="destinationLocation" class="bmd-label-floating"><span class="material-icons">
+      <label for="destinationLocation" class="location-form-label"><span class="material-icons">
           place
         </span>Choose destination</label>
       <input type="text" class="form-control" id="destinationLocation">
@@ -36,36 +36,36 @@
     
 
     <div class="create-heading">Time</div>
-    <label for="request-start-time">Enter a departure time:</label>
-    <input type="datetime-local" id="request-start-time" name="request-start-time" value="2018-06-12T19:30"
+    <label for="startTime">Enter a departure time:</label>
+    <input type="datetime-local" id="startTime" name="startTime" value="2018-06-12T19:30"
       min="2018-06-07T00:00" max="2100-06-14T00:00" />
     <div class="custom-control custom-checkbox">
       <input type="checkbox" class="custom-control-input" id="roundTripCheck">
       <label class="custom-control-label" for="roundTripCheck">Round trip?</label>
     </div>
     <div class="hide-on-click">
-      <label for="request-return-time">Enter a return time:</label>
-      <input type="datetime-local" id="request-return-time" name="request-return-time" value="2018-06-12T19:30"
+      <label for="returnTime">Enter a return time:</label>
+      <input type="datetime-local" id="returnTime" name="returnTime" value="2018-06-12T19:30"
         min="2018-06-07T00:00" max="2100-06-14T00:00" disabled />
     </div>
 
     <form class="form-inline">
       <div class="form-group">
-        <label id="requestMoneyLabel" for="requestMoneyInput" class="bmd-label">How much are you willing to pay?</label>
+        <label id="moneyLabel" for="moneyInput" class="bmd-label">How much are you willing to pay?</label>
         <div class="dollar-sign">
-          <input type="number" class="form-control" id="requestMoneyInput">
+          <input type="number" class="form-control" id="moneyInput">
         </div>
       </div>
     </form>
 
     <div>
-      <label for="requestAdditionalComments" class="">Additional comments:</label>
-      <input type="text" class="form-control" id="requestAdditionalComments" placeholder="Add any additional comments here...">
+      <label for="additionalComments" class="">Additional comments:</label>
+      <input type="text" class="form-control" id="additionalComments" placeholder="Add any additional comments here...">
     </div>  
   </div>
 
-  <button id="submitRequestButton" type="button" class="btn">
-    <i class="material-icons">chevron_left</i>Submit
+  <button id="submitButton" type="button" class="btn">
+    Submit<i class="material-icons">chevron_right</i>
   </button>
 
   <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
