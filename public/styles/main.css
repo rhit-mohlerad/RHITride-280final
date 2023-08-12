@@ -249,6 +249,16 @@ button>i {
     font-size: 1.2em;
 }
 
+#validationText {
+    color:white;
+    text-align: center;
+}
+
+#submitButton.profile-submit {
+    z-index: 999999;
+    color: white;
+}
+
 #startingLocation, #destinationLocation {
     padding-top: 2px;
 }

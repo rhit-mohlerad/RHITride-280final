@@ -16,28 +16,42 @@
     <a class="navbar-brand" href="#">Set Up Profile</a>
   </nav> -->
 
-    <div class="profileForms">
-      <img src="images/profile.jpg" id="myPicture">
-      <label for="input-file" id="uploadPhotoLabel">Upload Photo</label>
-      <input type="file" accept="image/jpeg, image/png, image/jpg" id="input-file">
+  <div class="profileForms">
+    <img src="images/profile.jpg" id="myPicture">
+    <label for="input-file" id="uploadPhotoLabel">Upload Photo</label>
+    <input type="file" accept="image/jpeg, image/png, image/jpg" id="input-file">
 
-      <div class="inputBox">
-        <input type="text" required="required" id="displayName">
-        <span>Display Name</span>
-      </div>
-      <div class="inputBox">
-        <input type="text" required="required" id="phoneNumber">
-        <span>Phone Number</span>
-      </div>
-      <div class="inputBox">
-        <input type="text" required="required" id="carModel">
-        <span>Car Model</span>
-      </div>
-      <div class="inputBox">
-        <input type="number" required="required" id="numSeats">
-        <span>Number of Seats</span>
-      </div>
+    <div class="inputBox">
+      <input type="text" id="displayName">
+      <span>Display Name</span>
     </div>
+    <div class="inputBox">
+      <input type="text" id="phoneNumber">
+      <span>Phone Number</span>
+    </div>
+    <div class="inputBox">
+      <input type="text" id="carModel">
+      <span>Car Model</span>
+    </div>
+    <div class="inputBox">
+      <input type="number" id="numSeats">
+      <span>Number of Seats</span>
+    </div>
+    <div class="inputBox">
+      <input type="text" id="venmoTag">
+      <span>Venmo Tag (optional)</span>
+    </div>
+    <div class="inputBox">
+      <input type="text" id="cashAppTag">
+      <span>CashApp Tag (optional)</span>
+    </div>
+
+    <div hidden id="validationText">You are missing some fields.</div>
+  </div>
+
+  <button id="submitButton" type="button" class="btn profile-submit">
+    Submit<i class="material-icons">chevron_right</i>
+  </button>
 
   <script src="scripts/jquery.min.js"></script>
   <script src="scripts/popper.js"></script>

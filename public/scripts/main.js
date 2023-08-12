@@ -19,6 +19,7 @@ rhit.fbUsersManager = null;
 rhit.fbRequestsManager = null;
 rhit.fbSingleRequestManager = null;
 rhit.fbSingleOfferManager = null;
+rhit.fbSingleUserManager = null;
 
 // from: https://stackoverflow.com/questions/494143/creating-a-new-dom-element-from-an-html-string-using-built-in-dom-methods-or-pro/35385518#35385518
 function htmlToElement(html) {
@@ -183,17 +184,17 @@ rhit.OffersPageController = class {
 		rhit.fbOffersManager.beginListening(this.updateList.bind(this));
 	}
 
-	beginListening(changeListener) {
-		this._unsubscribe = this._ref.onSnapshot((doc) => {
-			if (doc.exists) {
-				console.log("Document data: ", doc.data());
-				this._documentSnapshot = doc;
-				changeListener();
-			} else {
-				console.log("No such document!");
-			}
-		});
-	}
+	// beginListening(changeListener) {
+	// 	this._unsubscribe = this._ref.onSnapshot((doc) => {
+	// 		if (doc.exists) {
+	// 			console.log("Document data: ", doc.data());
+	// 			this._documentSnapshot = doc;
+	// 			changeListener();
+	// 		} else {
+	// 			console.log("No such document!");
+	// 		}
+	// 	});
+	// }
 
 	async _createCard(offer) {
 		this._ref = await firebase.firestore().collection(rhit.FB_COLLECTION_USERS).doc(offer.driver).get()
@@ -339,6 +340,9 @@ rhit.ProfilePageController = class {
 	constructor() {
 		rhit.fbOffersManager.beginListening(this.updateList.bind(this));
 		rhit.fbRequestsManager.beginListening(this.updateList.bind(this));
+		document.querySelector("#profileEditButton").onclick = (event) => {
+			window.location.href = `/profileSetup.html?id=${rhit.fbAuthManager.uid}`;
+		}
 		document.querySelector("#signOutButton").onclick = (event) => {
 			rhit.fbAuthManager.signOut();
 		}
@@ -477,6 +481,53 @@ rhit.ProfilePageController = class {
 		oldList.parentElement.appendChild(newList);
 	}
 
+}
+
+rhit.ProfileEditPageController = class {
+	constructor(userID) {
+		if (!rhit.fbSingleUserManager.id) {
+			document.querySelector("#submitButton").onclick = (event) => {
+				console.log("you tried submitting");
+				if (document.querySelector("#displayName").value == "" || document.querySelector("#phoneNumber").value == "") {
+					document.querySelector("#validationText").hidden = false;
+				} else {
+					const displayName = document.querySelector("#displayName").value;
+					const myPicture = document.querySelector("#myPicture").src;
+					const phoneNumber = document.querySelector("#phoneNumber").value;
+					const carModel = document.querySelector("#carModel").value;
+					const numSeats = document.querySelector("#numSeats").value;
+					const cashAppTag = document.querySelector("#cashAppTag").value;
+					const venmoTag = document.querySelector("#venmoTag").value;
+					rhit.fbUsersManager.add(displayName, myPicture, phoneNumber, carModel, numSeats, cashAppTag, venmoTag);
+				}
+			};
+		} else {
+			rhit.fbSingleUserManager.beginListening(() => {
+				document.querySelector("#displayName").value = rhit.fbSingleUserManager.displayName;
+				document.querySelector("#venmoTag").value = rhit.fbSingleUserManager.venmoTag;
+				document.querySelector("#cashAppTag").value = rhit.fbSingleUserManager.cashAppTag;
+				document.querySelector("#myPicture").src = rhit.fbSingleUserManager.profilePic;
+				document.querySelector("#phoneNumber").value = rhit.fbSingleUserManager.phoneNumber;
+				document.querySelector("#carModel").value = rhit.fbSingleUserManager.car;
+				document.querySelector("#numSeats").value = rhit.fbSingleUserManager.carSeats;
+			});
+			document.querySelector("#submitButton").onclick = (event) => {
+				console.log("you tried submitting");
+				if (document.querySelector("#displayName").value == "" || document.querySelector("#phoneNumber").value == "") {
+					document.querySelector("#validationText").hidden = false;
+				} else {
+					const displayName = document.querySelector("#displayName").value;
+					const myPicture = document.querySelector("#myPicture").src;
+					const phoneNumber = document.querySelector("#phoneNumber").value;
+					const carModel = document.querySelector("#carModel").value;
+					const numSeats = document.querySelector("#numSeats").value;
+					const cashAppTag = document.querySelector("#cashAppTag").value;
+					const venmoTag = document.querySelector("#venmoTag").value;
+					rhit.fbSingleUserManager.update(displayName, myPicture, phoneNumber, carModel, numSeats, cashAppTag, venmoTag);
+				}
+			};
+		}
+	}
 }
 
 rhit.CreateRequestPageController = class {
@@ -742,6 +793,7 @@ rhit.FbUsersManager = class {
 		this._documentSnapshots = [];
 		this._ref = firebase.firestore().collection(rhit.FB_COLLECTION_USERS);
 		this._unsubscribe = null;
+		this._uid = rhit.fbAuthManager.uid;
 	}
 	beginListening(changeListener) {
 		let query = this._ref.limit(100);
@@ -749,6 +801,25 @@ rhit.FbUsersManager = class {
 			this._documentSnapshots = querySnapshot.docs;
 			changeListener();
 		});
+	}
+
+	add(displayName, profilePic, phoneNumber, car, carSeats, cashAppTag = "", venmoTag = "") {
+		this._ref.doc(this._uid).set({
+				["displayName"]: displayName,
+				["profilePic"]: profilePic,
+				["phoneNumber"]: phoneNumber,
+				["car"]: car,
+				["seats"]: carSeats,
+				["cashAppTag"]: cashAppTag,
+				["venmoTag"]: venmoTag,
+			})
+			.then(() => {
+				console.log("Document successfully created");
+				window.location.href = `/profile.html?id=${this._uid}`
+			})
+			.catch(function (error) {
+				console.log("Error updating document: ", error);
+			});
 	}
 	stopListening() {
 		this._unsubscribe();
@@ -766,16 +837,92 @@ rhit.FbUsersManager = class {
 			if (docSnapshot.id === id) {
 				targetUser = docData;
 				userDoc = docSnapshot;
-				console.log(targetUser);
 				break;
 			}
+		}
+		if (!targetUser) {
+			return null;
 		}
 		rider = new rhit.Rider(id,
 			targetUser.displayName,
 			targetUser.profilePic
 		);
 		return rider;
+	}
+}
 
+rhit.FbSingleUserManager = class {
+	constructor(userID) {
+		this._id = userID;
+		this._documentSnapshot = {};
+		this._ref = firebase.firestore().collection(rhit.FB_COLLECTION_USERS).doc(userID);
+	}
+
+	beginListening(changeListener) {
+		this._unsubscribe = this._ref.onSnapshot((doc) => {
+			if (doc.exists) {
+				console.log("Document data: ", doc.data());
+				this._documentSnapshot = doc;
+				changeListener();
+			} else {
+				console.log("No such document!");
+			}
+		});
+	}
+
+	update(displayName, profilePic, phoneNumber, car, carSeats, cashAppTag = "", venmoTag = "") {
+		this._ref.update({
+				["displayName"]: displayName,
+				["profilePic"]: profilePic,
+				["phoneNumber"]: phoneNumber,
+				["car"]: car,
+				["seats"]: carSeats,
+				["cashAppTag"]: cashAppTag,
+				["venmoTag"]: venmoTag,
+			})
+			.then(() => {
+				console.log("Document successfully updated");
+				window.location.href = `/profile.html?id=${this._id}`
+			})
+			.catch(function (error) {
+				console.log("Error updating document: ", error);
+			});
+	}
+
+	delete() {
+		return this._ref.delete();
+	}
+
+	get id() {
+		return this._id;
+	}
+
+	get displayName() {
+		return this._documentSnapshot.get("displayName");
+	}
+
+	get profilePic() {
+		return this._documentSnapshot.get("profilePic");
+	}
+
+	get phoneNumber() {
+		return this._documentSnapshot.get("phoneNumber");
+	}
+
+	get car() {
+		return this._documentSnapshot.get("car");
+	}
+
+	get carSeats() {
+		return this._documentSnapshot.get("seats");
+	}
+
+	get cashAppTag() {
+		return this._documentSnapshot.get("cashAppTag");
+	}
+
+	get venmoTag() {
+		return this._documentSnapshot.get("venmoTag");
 	}
 }
 
@@ -920,6 +1067,7 @@ rhit.FbSingleOfferManager = class {
 		this._unsubscribe = this._ref.onSnapshot((doc) => {
 			if (doc.exists) {
 				console.log("Document data: ", doc.data());
+				console.log("its working");
 				this._documentSnapshot = doc;
 				changeListener();
 			} else {
@@ -989,26 +1137,26 @@ rhit.FbAuthManager = class {
 	beginListening(changeListener) {
 		firebase.auth().onAuthStateChanged((user) => {
 			//im pretty sure this is really inefficient cause it seems to run every time i change the page, but this is the only way I can get new users' documents to show up.
-			if (user) {
-				const userRef = firebase.firestore().collection(rhit.FB_COLLECTION_USERS).doc(user.uid);
-				userRef.get().then((doc) => {
-					if (!doc.exists) {
-						// User document doesn't exist, create a new user document
-						userRef.set({
-							displayName: user.displayName,
-							// Add other user properties as needed
-						}).then(() => {
-							console.log("New user document created!");
-						}).catch((error) => {
-							console.error("Error creating user document:", error);
-						});
-					} else {
-						console.log("user already exists.");
-					}
-				}).catch((error) => {
-					console.error("Error checking user document:", error);
-				});
-			}
+			// if (user) {
+			// 	const userRef = firebase.firestore().collection(rhit.FB_COLLECTION_USERS).doc(user.uid);
+			// 	userRef.get().then((doc) => {
+			// 		if (!doc.exists) {
+			// 			// User document doesn't exist, create a new user document
+			// 			userRef.set({
+			// 				displayName: user.displayName,
+			// 				// Add other user properties as needed
+			// 			}).then(() => {
+			// 				console.log("New user document created!");
+			// 			}).catch((error) => {
+			// 				console.error("Error creating user document:", error);
+			// 			});
+			// 		} else {
+			// 			console.log("user already exists.");
+			// 		}
+			// 	}).catch((error) => {
+			// 		console.error("Error checking user document:", error);
+			// 	});
+			// }
 			this._user = user;
 			changeListener();
 		});
@@ -1068,6 +1216,14 @@ rhit.initializePage = function () {
 		rhit.fbOffersManager = new rhit.FbOffersManager(uid);
 		new rhit.ProfilePageController();
 	}
+
+	if (document.querySelector("#profileBody")) {
+		console.log("profile setup page");
+		const uid = urlParams.get("id");
+		rhit.fbSingleUserManager = new rhit.FbSingleUserManager(uid);
+		new rhit.ProfileEditPageController();
+	}
+
 	if (document.querySelector("#requestsPage")) {
 		console.log("requests page");
 		rhit.fbRequestsManager = new rhit.FbRequestsManager();
@@ -1123,13 +1279,19 @@ rhit.checkForRedirects = function () {
 
 	//check if user displayName exist; otherwise redirect to profile edit page where they must put it in.
 	if (!document.querySelector("#loginPage") && rhit.fbAuthManager.isSignedIn && !document.querySelector("#profileBody")) {
-		rhit.fbUsersManager.beginListening(() => {
-			rhit.fbUsersManager.getUserByID(rhit.fbAuthManager.uid).then((user) => {
-				if (!user.displayName) {
-					window.location.href = "/profileSetup.html";
-				}
-			});
-		});
+		// rhit.fbUsersManager.beginListening(() => {
+		// 	rhit.fbUsersManager.getUserByID(rhit.fbAuthManager.uid).then((user) => {
+		// 		if (!user.displayName) {
+		// 			window.location.href = "/profileSetup.html";
+		// 		} else {
+		// 			rhit.fbUsersManager.stopListening();
+		// 		}
+		// 	});
+		// });
+
+		if (!rhit.fbUsersManager.getUserByID(rhit.fbAuthManager.uid)) {
+			window.location.href = "/profileSetup.html";
+		}
 	}
 
 	if (!document.querySelector("#loginPage") && !rhit.fbAuthManager.isSignedIn) {
@@ -1313,14 +1475,27 @@ rhit.main = function () {
 	console.log("Ready");
 
 	rhit.fbAuthManager = new rhit.FbAuthManager();
-	rhit.fbUsersManager = new rhit.FbUsersManager();
-	rhit.fbAuthManager.beginListening(() => {
-		console.log("auth change callback fired. TODO: check for redirects and init the page");
-		console.log("isSignedIn = ", rhit.fbAuthManager.isSignedIn);
-		rhit.checkForRedirects();
+	// rhit.fbAuthManager.beginListening(() => {
+	// 	console.log("auth change callback fired. TODO: check for redirects and init the page");
+	// 	console.log("isSignedIn = ", rhit.fbAuthManager.isSignedIn);
+	// 	rhit.checkForRedirects();
 
-		rhit.initializePage();
-	});
+	// 	rhit.initializePage();
+	// });
+
+	const authAndDataChangeCallback = () => {
+		rhit.fbUsersManager = new rhit.FbUsersManager();
+        console.log("auth change callback fired. TODO: check for redirects and init the page");
+        console.log("isSignedIn = ", rhit.fbAuthManager.isSignedIn);
+
+        // Check for redirects and initialize the page
+        rhit.checkForRedirects();
+        rhit.initializePage();
+    };
+
+    // Begin listening on both managers
+    rhit.fbAuthManager.beginListening(authAndDataChangeCallback);
+    // rhit.fbUsersManager.beginListening(authAndDataChangeCallback);
 };
 
 rhit.main();
