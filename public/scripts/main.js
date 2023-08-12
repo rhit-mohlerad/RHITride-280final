@@ -15,6 +15,7 @@ rhit.FB_COLLECTION_OFFERS = "Offers";
 rhit.FB_COLLECTION_USERS = "Users";
 rhit.fbAuthManager = null;
 rhit.fbOffersManager = null;
+rhit.fbUsersManager = null;
 rhit.fbRequestsManager = null;
 rhit.fbSingleRequestManager = null;
 rhit.fbSingleOfferManager = null;
@@ -56,6 +57,15 @@ rhit.Offer = class {
 		this.comment = comment;
 		this.seats = seats;
 		this.riders = riders;
+	}
+}
+
+//Class for displaying riders on offer detail page
+rhit.Rider = class {
+	constructor(id, displayName, profilePic) {
+		this.id = id;
+		this.displayName = displayName;
+		this.profilePic = profilePic;
 	}
 }
 
@@ -254,7 +264,23 @@ rhit.OffersPageController = class {
 rhit.OfferDetailPageController = class {
 	constructor() {
 		rhit.fbSingleOfferManager.beginListening(this.updateView.bind(this));
+		rhit.fbUsersManager.beginListening(this.updateList.bind(this));
+	}
 
+	async updateList() {
+		document.querySelector("#riderList").innerHTML = "";
+		for (const riderID of rhit.fbSingleOfferManager.riders) {
+			const rider = await rhit.fbUsersManager.getUserByID(riderID);
+			document.querySelector("#riderList").appendChild(this._createRider(rider));
+		}
+	}
+
+	_createRider(rider) {
+		return htmlToElement(`<div class="rider row">
+		<img src="${rider.profilePic}"
+	  alt="Profile Picture" class="rider-pfp">
+		<div class="rider-name">${rider.displayName}</div>
+	  </div>`);
 	}
 
 	async updateView() {
@@ -709,6 +735,48 @@ rhit.FbRequestsManager = class {
 	}
 }
 
+rhit.FbUsersManager = class {
+	constructor() {
+		this._documentSnapshots = [];
+		this._ref = firebase.firestore().collection(rhit.FB_COLLECTION_USERS);
+		this._unsubscribe = null;
+	}
+	beginListening(changeListener) {
+		//Closest start time is at the top. We still need to implement the auto-delete of documents that are outdated.
+		let query = this._ref.limit(100);
+		this._unsubscribe = query.onSnapshot((querySnapshot) => {
+			this._documentSnapshots = querySnapshot.docs;
+			changeListener();
+		});
+	}
+	stopListening() {
+		this._unsubscribe();
+	}
+	get length() {
+		return this._documentSnapshots.length;
+	}
+	async getUserByID(id) {
+		let targetUser = null;
+		let userDoc = null;
+
+		for (const docSnapshot of this._documentSnapshots) {
+			const docData = docSnapshot.data();
+			if (docSnapshot.id === id) {
+				targetUser = docData;
+				userDoc = docSnapshot;
+				break;
+			}
+		}
+		const rider = new rhit.Rider(userDoc.id,
+			targetUser.displayName,
+			targetUser.profilePic
+		);
+
+		return rider;
+
+	}
+}
+
 rhit.FbSingleRequestManager = class {
 	constructor(requestId) {
 		this._id = requestId;
@@ -906,6 +974,9 @@ rhit.FbSingleOfferManager = class {
 	get price() {
 		return this._documentSnapshot.get("price");
 	}
+	get riders() {
+		return this._documentSnapshot.get("riders");
+	}
 }
 
 rhit.FbAuthManager = class {
@@ -1009,6 +1080,7 @@ rhit.initializePage = function () {
 	if (document.querySelector("#offerDetailPage")) {
 		console.log("offer detail page");
 		const offerId = urlParams.get("id");
+		rhit.fbUsersManager = new rhit.FbUsersManager();
 		rhit.fbSingleOfferManager = new rhit.FbSingleOfferManager(offerId);
 		new rhit.OfferDetailPageController();
 	}
