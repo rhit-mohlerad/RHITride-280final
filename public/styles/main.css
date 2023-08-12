@@ -265,7 +265,21 @@ button>i {
     font-size: 1.2em;
 }
 
-.request-details,
+#riderHeading {
+    font-size: 1.5em;
+    font-weight: 500;
+}
+
+#passengerInfo {
+    background-color: #800000b6;
+    width: fit-content;
+    padding: 13px;
+    padding-right: 20px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+.details,
 #requestDetailPage {
     max-width: 100%;
 }
@@ -329,6 +343,21 @@ div.dollar-sign:after {
     border-radius: 100%;
     margin-left: 10px;
     margin-bottom: 30px;
+}
+
+.rider-pfp {
+    max-width: 20px;
+    position: absolute;
+    margin-left: 10px;
+    border-radius: 100%;
+}
+
+.rider-name {
+    margin-left: 35px;
+}
+
+.rider {
+    margin-bottom: 5px;
 }
 
 

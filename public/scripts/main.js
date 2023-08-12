@@ -251,6 +251,61 @@ rhit.OffersPageController = class {
 	}
 }
 
+rhit.OfferDetailPageController = class {
+	constructor() {
+		rhit.fbSingleOfferManager.beginListening(this.updateView.bind(this));
+
+	}
+
+	async updateView() {
+		if (rhit.fbSingleOfferManager.driver == rhit.fbAuthManager.uid) {
+			document.querySelector("#detailDropdown").style.display = "block";
+			document.querySelector("#editButton").onclick = (event) => {
+				window.location.href = `/createOffer.html?id=${rhit.fbSingleOfferManager.id}`
+			}
+			const button = document.querySelector("#detailActionButton");
+			button.innerHTML = "Cancel Offer";
+			button.onclick = (event) => {
+				rhit.fbSingleOfferManager.delete().then(() => {
+					console.log("Document successfully deleted!");
+					window.location.href = "/home.html";
+				}).catch((error) => {
+					console.error("Error removing document: ", error);
+				});;
+			}
+		} else {
+			const button = document.querySelector("#detailActionButton");
+			button.innerHTML = "Join Ride";
+			button.onclick = (event) => {
+				//add cur user as rider
+			}
+		}
+		this._ref = await firebase.firestore().collection(rhit.FB_COLLECTION_USERS).doc(rhit.fbSingleOfferManager.driver).get()
+		const _driver = this._ref.data();
+		document.querySelector(".detail-username").innerHTML = `${_driver.displayName} is offering a ride!`;
+		document.querySelector(".detail-pfp").src = _driver.profilePic;
+		document.querySelector(".detail-from").innerHTML = `From: ${rhit.fbSingleOfferManager.start}`;
+		document.querySelector(".detail-to").innerHTML = `To: ${rhit.fbSingleOfferManager.dest}`;
+		document.querySelector(".detail-departure").innerHTML = `Departure Time: ${rhit.fbSingleOfferManager.startTime.toDate().toLocaleDateString('en-us', {
+				weekday: "long",
+				month: "long",
+				day: "numeric",
+				hour: '2-digit',
+				minute: '2-digit'
+			})}`;
+		if (rhit.fbSingleOfferManager.endTime) {
+			document.querySelector(".detail-return").innerHTML = `Return Time: ${rhit.fbSingleOfferManager.endTime.toDate().toLocaleDateString('en-us', {
+					weekday: "long",
+					month: "long",
+					day: "numeric",
+					hour: '2-digit',
+					minute: '2-digit'
+				})}`;
+		}
+		document.querySelector(".detail-value").innerHTML = `$${rhit.fbSingleOfferManager.price}`;
+	};
+}
+
 rhit.ProfilePageController = class {
 	constructor() {
 		rhit.fbOffersManager.beginListening(this.updateList.bind(this));
@@ -949,6 +1004,13 @@ rhit.initializePage = function () {
 		rhit.fbOffersManager = new rhit.FbOffersManager();
 		rhit.fbSingleRequestManager = new rhit.FbSingleRequestManager(reqId);
 		new rhit.RequestDetailPageController();
+	}
+
+	if (document.querySelector("#offerDetailPage")) {
+		console.log("offer detail page");
+		const offerId = urlParams.get("id");
+		rhit.fbSingleOfferManager = new rhit.FbSingleOfferManager(offerId);
+		new rhit.OfferDetailPageController();
 	}
 
 	if (document.querySelector("#createRequestPage")) {
