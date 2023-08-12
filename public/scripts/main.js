@@ -136,7 +136,9 @@ rhit.RequestsPageController = class {
 				<img src="${_requester.profilePic}"
 				  alt="Profile Picture" class="card-pfp">
 				<h6 class="text-muted card-username">${_requester.displayName}'s Request</h6>
-				<div class="ride-type">${this.tripInfo}</div>
+			  </div>
+			  <div>
+			  <div class="ride-type">${this.tripInfo}</div>
 			  </div>
 			  <div class="card-locations">
 				<h6 class="text-muted card-from">From: ${request.start}</h6>
@@ -223,7 +225,9 @@ rhit.OffersPageController = class {
 					<img src="${_driver.profilePic}"
 					  alt="Profile Picture" class="card-pfp">
 					<h6 class="text-muted card-username">${_driver.displayName}'s Ride</h6>
-					<div class="card-seats-available">${offer.seats - offer.riders.length} seats available</div>
+				  </div>
+				  <div>
+				  <div class="card-seats-available">${offer.seats - offer.riders.length} seats available</div>
 				  </div>
 				  <div class="card-locations">
 					<h6 class="text-muted card-from">From: ${offer.start}</h6>
@@ -343,8 +347,16 @@ rhit.ProfilePageController = class {
 
 		rhit.fbSingleUserManager.beginListening(() => {
 			document.querySelector("#profileName").innerHTML = `${rhit.fbSingleUserManager.displayName}'s Profile`;
-			document.querySelector("#venmoTag").innerHTML = rhit.fbSingleUserManager.venmoTag;
-			document.querySelector("#cashAppTag").innerHTML = rhit.fbSingleUserManager.cashAppTag;
+			if (document.querySelector("#venmoTag").innerHTML != "") {
+				document.querySelector("#venmoTag").innerHTML = `<img
+				src="https://images.ctfassets.net/gkyt4bl1j2fs/ym6BkLqyGjMBmiCwtM7AW/829bf561ea771c00839b484cb8edeebb/App_Icon.png?w=276&h=276&q=50&fm=png&bg=transparent"
+				id="venmoLogo"> @${rhit.fbSingleUserManager.venmoTag}`;
+			}
+			if (document.querySelector("#cashAppTag").innerHTML != "") {
+				document.querySelector("#cashAppTag").innerHTML = `<img
+				src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSkPkkIBTYCgbLrhPxDHhsYtaj-aLE-gWjZ8A&usqp=CAU"
+				id="cashAppLogo"> $${rhit.fbSingleUserManager.cashAppTag}`;
+			}
 			document.querySelector("#profilePicture").src = rhit.fbSingleUserManager.profilePic;
 			document.querySelector("#profilePhoneNumber").innerHTML = rhit.fbSingleUserManager.phoneNumber;
 			document.querySelector("#profileCarInfo").innerHTML = `${rhit.fbSingleUserManager.carSeats} seat ${rhit.fbSingleUserManager.car}`;
@@ -561,6 +573,7 @@ rhit.ProfileEditPageController = class {
 			rhit.fbUsersManager.getUserByID(rhit.fbAuthManager.uid).then((user) => {
 				if (!user) {
 					console.log("creating user instead of updating");
+					document.querySelector("#editProfileHeading").innerHTML = "Create Your Profile";
 					document.querySelector("#submitButton").onclick = (event) => {
 						console.log("you tried submitting");
 						if (document.querySelector("#displayName").value == "" || document.querySelector("#phoneNumber").value == "") {
@@ -578,6 +591,7 @@ rhit.ProfileEditPageController = class {
 					};
 				} else {
 					console.log("updating user instead of creating");
+					document.querySelector("#editProfileHeading").innerHTML = "Edit Your Profile";
 					rhit.fbSingleUserManager.beginListening(() => {
 						document.querySelector("#displayName").value = rhit.fbSingleUserManager.displayName;
 						document.querySelector("#venmoTag").value = rhit.fbSingleUserManager.venmoTag;

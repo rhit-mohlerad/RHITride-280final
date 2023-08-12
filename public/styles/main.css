@@ -125,11 +125,13 @@ body {
 .card-seats-available,
 .ride-type {
     margin-left: auto;
+    width: fit-content;
     background-color: rgba(216, 2, 2, 0.361);
     padding: 3px;
     border-radius: 5px;
     margin-right: 5px;
-    margin-top: -27px;
+    margin-top: 0px;
+    margin-bottom: 10px;
 }
 
 hr {
@@ -259,6 +261,10 @@ button>i {
     height: fit-content;
 }
 
+#editProfileHeading {
+    color: white;
+}
+
 #imageToCrop {
     max-height: 500px;
 }
@@ -283,6 +289,8 @@ button>i {
 #submitButton.profile-submit {
     z-index: 999999;
     color: white;
+    position: static;
+    margin-left: auto;
 }
 
 #startingLocation, #destinationLocation {
@@ -344,7 +352,7 @@ div.dollar-sign:after {
     margin-top: -10px;
 }
 
-.detail-seats-available,
+/* .detail-seats-available,
 .ride-type {
     margin-left: auto;
     background-color: rgba(216, 2, 2, 0.361);
@@ -352,7 +360,7 @@ div.dollar-sign:after {
     border-radius: 5px;
     margin-right: 5px;
     margin-top: -27px;
-}
+} */
 
 .detail-locations {
     margin-top: 5px;

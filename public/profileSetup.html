@@ -24,6 +24,7 @@
   </nav> -->
 
   <div class="profileForms">
+    <h1 id="editProfileHeading">User Profile</h1>
     <img src="images/profile.jpg" id="myPicture">
     <label for="input-file" id="uploadPhotoLabel">Upload Photo</label>
     <input type="file" accept="image/jpeg, image/png, image/jpg" id="input-file">
@@ -54,11 +55,13 @@
     </div>
 
     <div hidden id="validationText">You are missing some fields.</div>
+
+    <button id="submitButton" type="button" class="btn profile-submit">
+      Submit<i class="material-icons">chevron_right</i>
+    </button>
   </div>
 
-  <button id="submitButton" type="button" class="btn profile-submit">
-    Submit<i class="material-icons">chevron_right</i>
-  </button>
+  
 
   <script src="scripts/jquery.min.js"></script>
   <script src="scripts/popper.js"></script>
