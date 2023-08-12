@@ -33,20 +33,20 @@
     </div>
 
     <div id="map"></div>
-    
+
 
     <div class="create-heading">Time</div>
     <label for="startTime">Enter a departure time:</label>
-    <input type="datetime-local" id="startTime" name="startTime" value="2018-06-12T19:30"
-      min="2018-06-07T00:00" max="2100-06-14T00:00" />
+    <input type="datetime-local" id="startTime" name="startTime" value="2018-06-12T19:30" min="2018-06-07T00:00"
+      max="2100-06-14T00:00" />
     <div class="custom-control custom-checkbox">
       <input type="checkbox" class="custom-control-input" id="roundTripCheck">
       <label class="custom-control-label" for="roundTripCheck">Round trip?</label>
     </div>
     <div class="hide-on-click">
       <label for="returnTime">Enter a return time:</label>
-      <input type="datetime-local" id="returnTime" name="returnTime" value="2018-06-12T19:30"
-        min="2018-06-07T00:00" max="2100-06-14T00:00" disabled />
+      <input type="datetime-local" id="returnTime" name="returnTime" value="2018-06-12T19:30" min="2018-06-07T00:00"
+        max="2100-06-14T00:00" disabled />
     </div>
 
     <form class="form-inline">
@@ -59,8 +59,8 @@
     </form>
     <form class="form-inline">
       <div class="form-group">
-        <label id="seatslabel" for="seatsInput" class="bmd-label">Seats available?</label>
-        <div class="">
+        <label id="seatsLabel" for="seatsInput" class="bmd-label">Seats available?</label>
+        <div>
           <input type="number" class="form-control" id="seatsInput">
         </div>
       </div>
@@ -69,7 +69,7 @@
     <div>
       <label for="additionalComments" class="">Additional comments:</label>
       <input type="text" class="form-control" id="additionalComments" placeholder="Add any additional comments here...">
-    </div>  
+    </div>
   </div>
 
   <button id="submitButton" type="button" class="btn">
@@ -90,9 +90,8 @@
   <script src="/__/firebase/init.js"></script>
   <script src="scripts/main.js"></script>
   <script
-      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAr4FD9HA_rd7Hvv_b-zSU85_95UJm752M&map_ids=6cd56b6d055b9278&libraries=places&callback=initMap"
-      async defer
-    ></script>
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAr4FD9HA_rd7Hvv_b-zSU85_95UJm752M&map_ids=6cd56b6d055b9278&libraries=places&callback=initMap"
+    async defer></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
 </body>
 

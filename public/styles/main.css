@@ -230,13 +230,13 @@ button>i {
     display: none;
 }
 
-#moneyLabel {
+#moneyLabel, #seatsLabel {
     position: static;
     margin-right: 5px;
     color: black;
 }
 
-#moneyInput {
+#moneyInput, #seatsInput {
     max-width: 60px;
 }
 
