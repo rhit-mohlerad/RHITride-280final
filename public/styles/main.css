@@ -253,7 +253,7 @@ button>i {
     padding-top: 2px;
 }
 
-#requestDetailActionButton {
+#detailActionButton {
     position: fixed;
     border-radius: 5px;
     bottom: 10px;
@@ -288,7 +288,7 @@ div.dollar-sign:after {
 
 .detail-username {
     margin-left: 10px;
-    font-size: 2em;
+    font-size: 1.22em;
     font-weight: 600;
     margin-bottom: 0;
     margin-top: -10px;
@@ -305,7 +305,7 @@ div.dollar-sign:after {
 }
 
 .detail-locations {
-    margin-top: -10px;
+    margin-top: 5px;
 }
 
 .detail-locations h6 {
@@ -325,7 +325,7 @@ div.dollar-sign:after {
 }
 
 .detail-pfp {
-    width: 100px;
+    width: 50px;
     border-radius: 100%;
     margin-left: 10px;
     margin-bottom: 30px;
@@ -333,7 +333,7 @@ div.dollar-sign:after {
 
 
 .detail-money {
-    margin-left: auto;
+    margin-left: 10px;
     margin-right: 40px;
     font-size: 1.25em;
 }
@@ -368,8 +368,17 @@ div.dollar-sign:after {
     left: -128px;
 }
 
-#requestDetailDropdown {
+#detailDropdown {
     display: none;
+}
+
+#mapButtonContainer {
+    text-align: center;
+}
+
+#mapButton {
+    max-height: 250px;
+    max-width: 90vw;
 }
 
 #uploadPhotoLabel {
@@ -460,6 +469,14 @@ div.dollar-sign:after {
 
     .desktop-button {
         display: block;
+    }
+
+    .detail-username {
+        font-size: 2em;
+    }
+
+    .detail-pfp {
+        width: 150px;
     }
 }
 

@@ -16,12 +16,12 @@
         chevron_left
       </span> Request Details</a>
       <div class="dropdown pull-xs-right">
-        <button class="btn bmd-btn-icon dropdown-toggle" type="button" id="requestDetailDropdown" data-toggle="dropdown"
+        <button class="btn bmd-btn-icon dropdown-toggle" type="button" id="detailDropdown" data-toggle="dropdown"
           aria-haspopup="true" aria-expanded="false">
           <i class="material-icons">more_vert</i>
         </button>
-        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="requestDetailDropdown">
-          <button id="requestEditButton" class="dropdown-item" type="button">Edit Request</button>
+        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="detailDropdown">
+          <button id="editButton" class="dropdown-item" type="button">Edit Request</button>
         </div>
   </nav>
   <div id="requestDetailPage" class="container page-container">
@@ -30,7 +30,6 @@
         <img src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png"
           alt="Profile Picture" class="detail-pfp">
         <h6 class="text-muted detail-username">John Doe's Request</h6>
-        <div class="ride-type"></div>
       </div>
       <div class="detail-locations">
         <h6 class="text-muted detail-from">From: Walmart Supercenter</h6>
@@ -41,14 +40,17 @@
           <h6 class="text-muted detail-departure">Departure Time: 2:45pm</h6>
           <h6 class="text-muted detail-return"></h6>
         </div>
-        <div class="detail-money row align-items-center">
-          <div class="">Pays&nbsp;</div>
-          <div class="detail-value">$10</div>
-        </div>
+      </div>
+      <div class="detail-money row align-items-center">
+        <div class="">Pays&nbsp;</div>
+        <div class="detail-value">$10</div>
+      </div>
+      <div id="mapButtonContainer">
+        <img id="mapButton" src="images/view in maps.png">
       </div>
     </div>
 
-    <button id="requestDetailActionButton" type="button" class="btn">Loading button
+    <button id="detailActionButton" type="button" class="btn">Loading button
     </button>
 
     <script src="scripts/jquery.min.js"></script>

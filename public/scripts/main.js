@@ -485,7 +485,9 @@ rhit.CreateOfferPageController = class {
 				const start = document.querySelector("#startingLocation").value;
 				const dest = document.querySelector("#destinationLocation").value;
 				const comment = document.querySelector("#additionalComments").value;
-				rhit.fbSingleOfferManager.update(startTime, endTime, price, start, dest, comment);
+				const seats = 5; // placeholder values
+				const riders = 0;
+				rhit.fbSingleOfferManager.update(startTime, endTime, price, start, dest, comment, seats, riders);
 			}
 		} else {
 			document.querySelector("#submitButton").onclick = (event) => {
@@ -499,9 +501,9 @@ rhit.CreateOfferPageController = class {
 				const start = document.querySelector("#startingLocation").value;
 				const dest = document.querySelector("#destinationLocation").value;
 				const comment = document.querySelector("#additionalComments").value;
-				const seats = 5; // placeholder values
+				const seats = parseInt(document.querySelector("#seatsInput").value); // placeholder values
 				const riders = 0;
-				rhit.fbOffersManager.add(driver, startTime, endTime, price, start, dest, comment, seats, riders);
+				rhit.fbOffersManager.add(driver, startTime, endTime, price, start, dest, comment, seats);
 			}
 		}
 		document.querySelector("#roundTripCheck").onclick = (event) => {
@@ -529,11 +531,11 @@ rhit.RequestDetailPageController = class {
 
 	async updateView() {
 		if (rhit.fbSingleRequestManager.requester == rhit.fbAuthManager.uid) {
-			document.querySelector("#requestDetailDropdown").style.display = "block";
-			document.querySelector("#requestEditButton").onclick = (event) => {
+			document.querySelector("#detailDropdown").style.display = "block";
+			document.querySelector("#editButton").onclick = (event) => {
 				window.location.href = `/createRequest.html?id=${rhit.fbSingleRequestManager.id}`
 			}
-			const button = document.querySelector("#requestDetailActionButton");
+			const button = document.querySelector("#detailActionButton");
 			button.innerHTML = "Cancel Request";
 			button.onclick = (event) => {
 				rhit.fbSingleRequestManager.delete().then(() => {
@@ -544,7 +546,7 @@ rhit.RequestDetailPageController = class {
 				});;
 			}
 		} else {
-			const button = document.querySelector("#requestDetailActionButton");
+			const button = document.querySelector("#detailActionButton");
 			button.innerHTML = "Offer Ride";
 			button.onclick = (event) => {
 				const driver = rhit.fbAuthManager.uid;
@@ -553,7 +555,7 @@ rhit.RequestDetailPageController = class {
 				const price = rhit.fbSingleRequestManager.payment;
 				const start = rhit.fbSingleRequestManager.start;
 				const dest = rhit.fbSingleRequestManager.dest;
-				const comment = ""; //figure out later
+				const comment = ""; // figure out later
 				const seats = 5; //figure out later
 				const riders = [rhit.fbSingleRequestManager.requester];
 				console.log(driver, startTime, endTime, price, start, dest, riders);
@@ -567,9 +569,8 @@ rhit.RequestDetailPageController = class {
 		}
 		this._ref = await firebase.firestore().collection(rhit.FB_COLLECTION_USERS).doc(rhit.fbSingleRequestManager.requester).get()
 		const _requester = this._ref.data();
-		document.querySelector(".detail-username").innerHTML = `${_requester.displayName}'s Request`;
+		document.querySelector(".detail-username").innerHTML = `${_requester.displayName} is requesting a ride!`;
 		document.querySelector(".detail-pfp").src = _requester.profilePic;
-		document.querySelector(".ride-type").innerHTML = `Drop-Off Only`;
 		document.querySelector(".detail-from").innerHTML = `From: ${rhit.fbSingleRequestManager.start}`;
 		document.querySelector(".detail-to").innerHTML = `To: ${rhit.fbSingleRequestManager.dest}`;
 		document.querySelector(".detail-departure").innerHTML = `Departure Time: ${rhit.fbSingleRequestManager.startTime.toDate().toLocaleDateString('en-us', {
@@ -580,7 +581,6 @@ rhit.RequestDetailPageController = class {
 				minute: '2-digit'
 			})}`;
 		if (rhit.fbSingleRequestManager.endTime) {
-			document.querySelector(".ride-type").innerHTML = `Round-Trip`;
 			document.querySelector(".detail-return").innerHTML = `Return Time: ${rhit.fbSingleRequestManager.endTime.toDate().toLocaleDateString('en-us', {
 					weekday: "long",
 					month: "long",
@@ -729,7 +729,7 @@ rhit.FbOffersManager = class {
 		this._ref = firebase.firestore().collection(rhit.FB_COLLECTION_OFFERS);
 		this._unsubscribe = null;
 	}
-	add(driver, startTime, endTime, price, start, dest, comment, seats, riders, ) {
+	add(driver, startTime, endTime, price, start, dest, comment, seats, riders = []) {
 		this._ref.add({
 				["driver"]: driver,
 				["startTime"]: startTime,
