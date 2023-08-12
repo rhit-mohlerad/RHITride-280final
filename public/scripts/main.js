@@ -340,6 +340,16 @@ rhit.ProfilePageController = class {
 	constructor() {
 		rhit.fbOffersManager.beginListening(this.updateList.bind(this));
 		rhit.fbRequestsManager.beginListening(this.updateList.bind(this));
+
+		rhit.fbSingleUserManager.beginListening(() => {
+			document.querySelector("#profileName").innerHTML = `${rhit.fbSingleUserManager.displayName}'s Profile`;
+			document.querySelector("#venmoTag").innerHTML = rhit.fbSingleUserManager.venmoTag;
+			document.querySelector("#cashAppTag").innerHTML = rhit.fbSingleUserManager.cashAppTag;
+			document.querySelector("#profilePicture").src = rhit.fbSingleUserManager.profilePic;
+			document.querySelector("#profilePhoneNumber").innerHTML = rhit.fbSingleUserManager.phoneNumber;
+			document.querySelector("#profileCarInfo").innerHTML = `${rhit.fbSingleUserManager.carSeats} seat ${rhit.fbSingleUserManager.car}`;
+		});
+
 		document.querySelector("#profileEditButton").onclick = (event) => {
 			window.location.href = `/profileSetup.html?id=${rhit.fbAuthManager.uid}`;
 		}
@@ -542,7 +552,7 @@ rhit.ProfileEditPageController = class {
 
 				// Close the modal
 				cropModal.style.display = "none";
-				
+
 			}, "image/jpeg");
 		});
 
@@ -1276,6 +1286,7 @@ rhit.initializePage = function () {
 	if (document.querySelector("#profilePage")) {
 		console.log("profile page");
 		const uid = urlParams.get("id");
+		rhit.fbSingleUserManager = new rhit.FbSingleUserManager(uid);
 		rhit.fbRequestsManager = new rhit.FbRequestsManager(uid);
 		rhit.fbOffersManager = new rhit.FbOffersManager(uid);
 		new rhit.ProfilePageController();
