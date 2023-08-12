@@ -485,6 +485,70 @@ rhit.ProfilePageController = class {
 
 rhit.ProfileEditPageController = class {
 	constructor(userID) {
+		//init references to page information
+		const inputFile = document.getElementById("input-file");
+		const myPicture = document.getElementById("myPicture");
+		const imageToCrop = document.getElementById("imageToCrop");
+		const cropButton = document.getElementById("cropButton");
+		//instantiate cropper instance variable for later
+		let cropperInstance = null;
+
+		//When we upload a file, this will trigger
+		inputFile.addEventListener("change", async (event) => {
+			const file = event.target.files[0];
+			if (file) {
+				try {
+					const storageRef = firebase.storage().ref();
+					const fileRef = storageRef.child("profileImages/" + file.name);
+
+					// Upload the image to FB storage
+					const snapshot = await fileRef.put(file);
+
+					// Get the download URL of the image
+					const downloadURL = await snapshot.ref.getDownloadURL();
+
+					// Set the image source to the download URL
+					imageToCrop.src = downloadURL;
+					cropModal.style.display = "block"; // Show the modal for cropping
+
+					// Initialize the Cropper instance
+					cropperInstance = new Cropper(imageToCrop, {
+						aspectRatio: 1,
+						viewMode: 2,
+						scalable: true,
+					});
+					console.log("File uploaded and URL:", downloadURL);
+				} catch (error) {
+					console.error("Error uploading file:", error);
+				}
+			}
+		});
+
+		//Crop button on the modal. Saves the changes and uploads the 
+		cropButton.addEventListener("click", async () => {
+			// Get the cropped image data as a Blob
+			const croppedImageData = cropperInstance.getCroppedCanvas().toBlob(async (blob) => {
+				// upload the croppedImageData to Firebase Storage
+				const storageRef = firebase.storage().ref();
+				const fileRef = storageRef.child("profileImages/" + inputFile.name);
+				const snapshot = await fileRef.put(blob);
+
+				// Get the download URL
+				const downloadURL = await snapshot.ref.getDownloadURL();
+
+				// Update the image sources
+				myPicture.src = downloadURL;
+				imageToCrop.src = downloadURL;
+
+				// Close the modal
+				cropModal.style.display = "none";
+				
+			}, "image/jpeg");
+		});
+
+
+
+
 		if (!rhit.fbSingleUserManager.id) {
 			document.querySelector("#submitButton").onclick = (event) => {
 				console.log("you tried submitting");
@@ -1485,17 +1549,17 @@ rhit.main = function () {
 
 	const authAndDataChangeCallback = () => {
 		rhit.fbUsersManager = new rhit.FbUsersManager();
-        console.log("auth change callback fired. TODO: check for redirects and init the page");
-        console.log("isSignedIn = ", rhit.fbAuthManager.isSignedIn);
+		console.log("auth change callback fired. TODO: check for redirects and init the page");
+		console.log("isSignedIn = ", rhit.fbAuthManager.isSignedIn);
 
-        // Check for redirects and initialize the page
-        rhit.checkForRedirects();
-        rhit.initializePage();
-    };
+		// Check for redirects and initialize the page
+		rhit.checkForRedirects();
+		rhit.initializePage();
+	};
 
-    // Begin listening on both managers
-    rhit.fbAuthManager.beginListening(authAndDataChangeCallback);
-    // rhit.fbUsersManager.beginListening(authAndDataChangeCallback);
+	// Begin listening on both managers
+	rhit.fbAuthManager.beginListening(authAndDataChangeCallback);
+	// rhit.fbUsersManager.beginListening(authAndDataChangeCallback);
 };
 
 rhit.main();
