@@ -557,50 +557,54 @@ rhit.ProfileEditPageController = class {
 		});
 
 
-
-
-		if (!rhit.fbSingleUserManager.id) {
-			document.querySelector("#submitButton").onclick = (event) => {
-				console.log("you tried submitting");
-				if (document.querySelector("#displayName").value == "" || document.querySelector("#phoneNumber").value == "") {
-					document.querySelector("#validationText").hidden = false;
+		rhit.fbUsersManager.beginListening(() => {
+			rhit.fbUsersManager.getUserByID(rhit.fbAuthManager.uid).then((user) => {
+				if (!user) {
+					console.log("creating user instead of updating");
+					document.querySelector("#submitButton").onclick = (event) => {
+						console.log("you tried submitting");
+						if (document.querySelector("#displayName").value == "" || document.querySelector("#phoneNumber").value == "") {
+							document.querySelector("#validationText").hidden = false;
+						} else {
+							const displayName = document.querySelector("#displayName").value;
+							const myPicture = document.querySelector("#myPicture").src;
+							const phoneNumber = document.querySelector("#phoneNumber").value;
+							const carModel = document.querySelector("#carModel").value;
+							const numSeats = document.querySelector("#numSeats").value;
+							const cashAppTag = document.querySelector("#cashAppTag").value;
+							const venmoTag = document.querySelector("#venmoTag").value;
+							rhit.fbUsersManager.add(displayName, myPicture, phoneNumber, carModel, numSeats, cashAppTag, venmoTag);
+						}
+					};
 				} else {
-					const displayName = document.querySelector("#displayName").value;
-					const myPicture = document.querySelector("#myPicture").src;
-					const phoneNumber = document.querySelector("#phoneNumber").value;
-					const carModel = document.querySelector("#carModel").value;
-					const numSeats = document.querySelector("#numSeats").value;
-					const cashAppTag = document.querySelector("#cashAppTag").value;
-					const venmoTag = document.querySelector("#venmoTag").value;
-					rhit.fbUsersManager.add(displayName, myPicture, phoneNumber, carModel, numSeats, cashAppTag, venmoTag);
+					console.log("updating user instead of creating");
+					rhit.fbSingleUserManager.beginListening(() => {
+						document.querySelector("#displayName").value = rhit.fbSingleUserManager.displayName;
+						document.querySelector("#venmoTag").value = rhit.fbSingleUserManager.venmoTag;
+						document.querySelector("#cashAppTag").value = rhit.fbSingleUserManager.cashAppTag;
+						document.querySelector("#myPicture").src = rhit.fbSingleUserManager.profilePic;
+						document.querySelector("#phoneNumber").value = rhit.fbSingleUserManager.phoneNumber;
+						document.querySelector("#carModel").value = rhit.fbSingleUserManager.car;
+						document.querySelector("#numSeats").value = rhit.fbSingleUserManager.carSeats;
+					});
+					document.querySelector("#submitButton").onclick = (event) => {
+						console.log("you tried submitting");
+						if (document.querySelector("#displayName").value == "" || document.querySelector("#phoneNumber").value == "") {
+							document.querySelector("#validationText").hidden = false;
+						} else {
+							const displayName = document.querySelector("#displayName").value;
+							const myPicture = document.querySelector("#myPicture").src;
+							const phoneNumber = document.querySelector("#phoneNumber").value;
+							const carModel = document.querySelector("#carModel").value;
+							const numSeats = document.querySelector("#numSeats").value;
+							const cashAppTag = document.querySelector("#cashAppTag").value;
+							const venmoTag = document.querySelector("#venmoTag").value;
+							rhit.fbSingleUserManager.update(displayName, myPicture, phoneNumber, carModel, numSeats, cashAppTag, venmoTag);
+						}
+					};
 				}
-			};
-		} else {
-			rhit.fbSingleUserManager.beginListening(() => {
-				document.querySelector("#displayName").value = rhit.fbSingleUserManager.displayName;
-				document.querySelector("#venmoTag").value = rhit.fbSingleUserManager.venmoTag;
-				document.querySelector("#cashAppTag").value = rhit.fbSingleUserManager.cashAppTag;
-				document.querySelector("#myPicture").src = rhit.fbSingleUserManager.profilePic;
-				document.querySelector("#phoneNumber").value = rhit.fbSingleUserManager.phoneNumber;
-				document.querySelector("#carModel").value = rhit.fbSingleUserManager.car;
-				document.querySelector("#numSeats").value = rhit.fbSingleUserManager.carSeats;
 			});
-			document.querySelector("#submitButton").onclick = (event) => {
-				console.log("you tried submitting");
-				if (document.querySelector("#displayName").value == "" || document.querySelector("#phoneNumber").value == "") {
-					document.querySelector("#validationText").hidden = false;
-				} else {
-					const displayName = document.querySelector("#displayName").value;
-					const myPicture = document.querySelector("#myPicture").src;
-					const phoneNumber = document.querySelector("#phoneNumber").value;
-					const carModel = document.querySelector("#carModel").value;
-					const numSeats = document.querySelector("#numSeats").value;
-					const cashAppTag = document.querySelector("#cashAppTag").value;
-					const venmoTag = document.querySelector("#venmoTag").value;
-					rhit.fbSingleUserManager.update(displayName, myPicture, phoneNumber, carModel, numSeats, cashAppTag, venmoTag);
-				}
-			};
-		}
+		});
 	}
 }
 
@@ -867,7 +871,10 @@ rhit.FbUsersManager = class {
 		this._documentSnapshots = [];
 		this._ref = firebase.firestore().collection(rhit.FB_COLLECTION_USERS);
 		this._unsubscribe = null;
-		this._uid = rhit.fbAuthManager.uid;
+		this._uid = null;
+		if (rhit.fbAuthManager.isSignedIn) {
+			this._uid = rhit.fbAuthManager.uid;
+		}
 	}
 	beginListening(changeListener) {
 		let query = this._ref.limit(100);
@@ -1270,7 +1277,9 @@ rhit.FbAuthManager = class {
 rhit.initializePage = function () {
 	const urlParams = new URLSearchParams(window.location.search);
 	const profileButtons = document.querySelectorAll(".profile-button");
-	profileButtons.forEach(link => link.href += `?id=${rhit.fbAuthManager.uid}`);
+	if (rhit.fbAuthManager.isSignedIn) {
+		profileButtons.forEach(link => link.href += `?id=${rhit.fbAuthManager.uid}`);
+	}
 
 	if (document.querySelector("#loginPage")) {
 		console.log("login page");
@@ -1352,25 +1361,23 @@ rhit.checkForRedirects = function () {
 		window.location.href = "/home.html";
 	}
 
-	//check if user displayName exist; otherwise redirect to profile edit page where they must put it in.
-	if (!document.querySelector("#loginPage") && rhit.fbAuthManager.isSignedIn && !document.querySelector("#profileBody")) {
-		// rhit.fbUsersManager.beginListening(() => {
-		// 	rhit.fbUsersManager.getUserByID(rhit.fbAuthManager.uid).then((user) => {
-		// 		if (!user.displayName) {
-		// 			window.location.href = "/profileSetup.html";
-		// 		} else {
-		// 			rhit.fbUsersManager.stopListening();
-		// 		}
-		// 	});
-		// });
-
-		if (!rhit.fbUsersManager.getUserByID(rhit.fbAuthManager.uid)) {
-			window.location.href = "/profileSetup.html";
-		}
-	}
-
 	if (!document.querySelector("#loginPage") && !rhit.fbAuthManager.isSignedIn) {
 		window.location.href = "/";
+	}
+
+	//check if user displayName exist; otherwise redirect to profile edit page where they must put it in.
+	if (!document.querySelector("#loginPage") && rhit.fbAuthManager.isSignedIn && !document.querySelector("#profileBody")) {
+		rhit.fbUsersManager.beginListening(() => {
+			rhit.fbUsersManager.getUserByID(rhit.fbAuthManager.uid).then((user) => {
+				if (!user) {
+					window.location.href = `/profileSetup.html?id=${rhit.fbAuthManager.uid}`;
+				}
+			});
+		});
+
+		// if (!rhit.fbUsersManager.getUserByID(rhit.fbAuthManager.uid)) {
+		// 	window.location.href = "/profileSetup.html";
+		// }
 	}
 
 
