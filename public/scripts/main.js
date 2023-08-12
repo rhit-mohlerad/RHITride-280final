@@ -567,8 +567,7 @@ rhit.CreateOfferPageController = class {
 				const dest = document.querySelector("#destinationLocation").value;
 				const comment = document.querySelector("#additionalComments").value;
 				const seats = 5; // placeholder values
-				const riders = 0;
-				rhit.fbSingleOfferManager.update(startTime, endTime, price, start, dest, comment, seats, riders);
+				rhit.fbSingleOfferManager.update(startTime, endTime, price, start, dest, comment, seats, rhit.fbSingleOfferManager.riders);
 			}
 		} else {
 			document.querySelector("#submitButton").onclick = (event) => {
