@@ -62,10 +62,15 @@ rhit.Offer = class {
 
 //Class for displaying riders on offer detail page
 rhit.Rider = class {
-	constructor(id, displayName, profilePic) {
+	constructor(id, displayName, profilePic, phoneNumber, car = "", carSeats, cashAppTag, venmoTag) {
 		this.id = id;
 		this.displayName = displayName;
 		this.profilePic = profilePic;
+		this.phoneNumber = phoneNumber;
+		this.car = car;
+		this.carSeats = carSeats;
+		this.cashAppTag = cashAppTag;
+		this.venmoTag = venmoTag;
 	}
 }
 
@@ -80,8 +85,6 @@ rhit.LoginPageController = class {
 
 rhit.HomePageController = class {
 	constructor() {
-		// rhit.fbOffersManager.beginListening(this.updateList.bind(this));
-
 		document.querySelector("#createRequestButton").onclick = (event) => {
 			window.location.href = `/createRequest.html`
 		}
@@ -741,7 +744,6 @@ rhit.FbUsersManager = class {
 		this._unsubscribe = null;
 	}
 	beginListening(changeListener) {
-		//Closest start time is at the top. We still need to implement the auto-delete of documents that are outdated.
 		let query = this._ref.limit(100);
 		this._unsubscribe = query.onSnapshot((querySnapshot) => {
 			this._documentSnapshots = querySnapshot.docs;
@@ -757,21 +759,21 @@ rhit.FbUsersManager = class {
 	async getUserByID(id) {
 		let targetUser = null;
 		let userDoc = null;
+		let rider = null;
 
 		for (const docSnapshot of this._documentSnapshots) {
 			const docData = docSnapshot.data();
 			if (docSnapshot.id === id) {
 				targetUser = docData;
 				userDoc = docSnapshot;
-				console.log(userDoc);
+				console.log(targetUser);
 				break;
 			}
 		}
-		const rider = new rhit.Rider(userDoc.id,
+		rider = new rhit.Rider(id,
 			targetUser.displayName,
 			targetUser.profilePic
 		);
-
 		return rider;
 
 	}
@@ -1083,7 +1085,6 @@ rhit.initializePage = function () {
 	if (document.querySelector("#offerDetailPage")) {
 		console.log("offer detail page");
 		const offerId = urlParams.get("id");
-		rhit.fbUsersManager = new rhit.FbUsersManager();
 		rhit.fbSingleOfferManager = new rhit.FbSingleOfferManager(offerId);
 		new rhit.OfferDetailPageController();
 	}
@@ -1118,7 +1119,17 @@ rhit.initializePage = function () {
 rhit.checkForRedirects = function () {
 	if (document.querySelector("#loginPage") && rhit.fbAuthManager.isSignedIn) {
 		window.location.href = "/home.html";
-		//check if user fields exist; otherwise redirect to profile edit page
+	}
+
+	//check if user displayName exist; otherwise redirect to profile edit page where they must put it in.
+	if (!document.querySelector("#loginPage") && rhit.fbAuthManager.isSignedIn && !document.querySelector("#profileBody")) {
+		rhit.fbUsersManager.beginListening(() => {
+			rhit.fbUsersManager.getUserByID(rhit.fbAuthManager.uid).then((user) => {
+				if (!user.displayName) {
+					window.location.href = "/profileSetup.html";
+				}
+			});
+		});
 	}
 
 	if (!document.querySelector("#loginPage") && !rhit.fbAuthManager.isSignedIn) {
@@ -1302,10 +1313,10 @@ rhit.main = function () {
 	console.log("Ready");
 
 	rhit.fbAuthManager = new rhit.FbAuthManager();
+	rhit.fbUsersManager = new rhit.FbUsersManager();
 	rhit.fbAuthManager.beginListening(() => {
 		console.log("auth change callback fired. TODO: check for redirects and init the page");
 		console.log("isSignedIn = ", rhit.fbAuthManager.isSignedIn);
-
 		rhit.checkForRedirects();
 
 		rhit.initializePage();
