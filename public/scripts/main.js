@@ -763,6 +763,7 @@ rhit.FbUsersManager = class {
 			if (docSnapshot.id === id) {
 				targetUser = docData;
 				userDoc = docSnapshot;
+				console.log(userDoc);
 				break;
 			}
 		}
@@ -845,8 +846,9 @@ rhit.FbSingleRequestManager = class {
 }
 
 rhit.FbOffersManager = class {
-	constructor(uid) {
+	constructor(uid, limit = 50) {
 		this._uid = uid;
+		this._limit = limit;
 		this._documentSnapshots = [];
 		this._ref = firebase.firestore().collection(rhit.FB_COLLECTION_OFFERS);
 		this._unsubscribe = null;
@@ -873,7 +875,7 @@ rhit.FbOffersManager = class {
 			});
 	}
 	beginListening(changeListener) {
-		let query = this._ref.orderBy("startTime", "asc").limit(50);
+		let query = this._ref.orderBy("startTime", "asc").limit(this._limit);
 		if (this._uid) {
 			query = query.where("driver", "==", this._uid);
 		}
@@ -1053,6 +1055,8 @@ rhit.initializePage = function () {
 	if (document.querySelector("#mainPage")) {
 		console.log("home page");
 		new rhit.HomePageController();
+		rhit.fbOffersManager = new rhit.FbOffersManager(null, 5);
+		new rhit.OffersPageController();
 	}
 
 	if (document.querySelector("#profilePage")) {
