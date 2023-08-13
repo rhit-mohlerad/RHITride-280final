@@ -20,6 +20,7 @@ rhit.fbRequestsManager = null;
 rhit.fbSingleRequestManager = null;
 rhit.fbSingleOfferManager = null;
 rhit.fbSingleUserManager = null;
+rhit.mapAPIManager = null;
 
 // from: https://stackoverflow.com/questions/494143/creating-a-new-dom-element-from-an-html-string-using-built-in-dom-methods-or-pro/35385518#35385518
 function htmlToElement(html) {
@@ -185,18 +186,6 @@ rhit.OffersPageController = class {
 	constructor() {
 		rhit.fbOffersManager.beginListening(this.updateList.bind(this));
 	}
-
-	// beginListening(changeListener) {
-	// 	this._unsubscribe = this._ref.onSnapshot((doc) => {
-	// 		if (doc.exists) {
-	// 			console.log("Document data: ", doc.data());
-	// 			this._documentSnapshot = doc;
-	// 			changeListener();
-	// 		} else {
-	// 			console.log("No such document!");
-	// 		}
-	// 	});
-	// }
 
 	async _createCard(offer) {
 		this._ref = await firebase.firestore().collection(rhit.FB_COLLECTION_USERS).doc(offer.driver).get()
@@ -531,7 +520,6 @@ rhit.ProfileEditPageController = class {
 		const cropButton = document.getElementById("cropButton");
 		//instantiate cropper instance variable for later
 		let cropperInstance = null;
-
 		//When we upload a file, this will trigger
 		inputFile.addEventListener("change", async (event) => {
 			const file = event.target.files[0];
@@ -1213,15 +1201,15 @@ rhit.FbSingleOfferManager = class {
 			const currentRiders = doc.data().riders || [];
 			currentRiders.push(newRider);
 			this._ref.update({
-				["riders"]: currentRiders,
-			})
-			.then(() => {
-				console.log("Document successfully updated");
-				window.location.href = `/offerDetails.html?id=${this._id}`;
-			})
-			.catch(function (error) {
-				console.log("Error updating document: ", error);
-			});
+					["riders"]: currentRiders,
+				})
+				.then(() => {
+					console.log("Document successfully updated");
+					window.location.href = `/offerDetails.html?id=${this._id}`;
+				})
+				.catch(function (error) {
+					console.log("Error updating document: ", error);
+				});
 		})
 	}
 
@@ -1230,15 +1218,15 @@ rhit.FbSingleOfferManager = class {
 			const currentRiders = doc.data().riders || [];
 			currentRiders.splice(currentRiders.indexOf(rider), 1);
 			this._ref.update({
-				["riders"]: currentRiders,
-			})
-			.then(() => {
-				console.log("Document successfully updated");
-				window.location.href = `/offerDetails.html?id=${this._id}`;
-			})
-			.catch(function (error) {
-				console.log("Error updating document: ", error);
-			});
+					["riders"]: currentRiders,
+				})
+				.then(() => {
+					console.log("Document successfully updated");
+					window.location.href = `/offerDetails.html?id=${this._id}`;
+				})
+				.catch(function (error) {
+					console.log("Error updating document: ", error);
+				});
 		})
 	}
 
@@ -1287,27 +1275,6 @@ rhit.FbAuthManager = class {
 	}
 	beginListening(changeListener) {
 		firebase.auth().onAuthStateChanged((user) => {
-			//im pretty sure this is really inefficient cause it seems to run every time i change the page, but this is the only way I can get new users' documents to show up.
-			// if (user) {
-			// 	const userRef = firebase.firestore().collection(rhit.FB_COLLECTION_USERS).doc(user.uid);
-			// 	userRef.get().then((doc) => {
-			// 		if (!doc.exists) {
-			// 			// User document doesn't exist, create a new user document
-			// 			userRef.set({
-			// 				displayName: user.displayName,
-			// 				// Add other user properties as needed
-			// 			}).then(() => {
-			// 				console.log("New user document created!");
-			// 			}).catch((error) => {
-			// 				console.error("Error creating user document:", error);
-			// 			});
-			// 		} else {
-			// 			console.log("user already exists.");
-			// 		}
-			// 	}).catch((error) => {
-			// 		console.error("Error checking user document:", error);
-			// 	});
-			// }
 			this._user = user;
 			changeListener();
 		});
@@ -1426,6 +1393,12 @@ rhit.initializePage = function () {
 	}
 };
 
+function initMap() {
+	// This function will be called when the Google Maps API is loaded
+	rhit.mapAPIManager = new rhit.MapAPIManager("map");
+	rhit.mapAPIManager.initMap();
+}
+
 rhit.checkForRedirects = function () {
 	if (document.querySelector("#loginPage") && rhit.fbAuthManager.isSignedIn) {
 		window.location.href = "/home.html";
@@ -1452,174 +1425,156 @@ rhit.checkForRedirects = function () {
 
 
 };
-//----------------------------- Profile Picture Upload -----------------------------
-//Mostly rough test code that I will move later into a controller and manager
-window.addEventListener('load', function () {
-	document.querySelector('input[type="file"]').addEventListener('change', function () {
-		if (this.files && this.files[0]) {
-			var img = document.querySelector('img');
-			img.onload = () => {
-				URL.revokeObjectURL(img.src); // no longer needed, free memory
+
+
+rhit.MapAPIManager = class {
+	constructor() {
+		this.mapElementId = "map";
+		this.map = null;
+		this.markers = [];
+		this.directionsService = new google.maps.DirectionsService();
+		this.directionsRenderer = new google.maps.DirectionsRenderer();
+		this.directionsRenderer.setOptions({
+			suppressMarkers: true
+		});
+		this.directionsRenderer.setMap(this.map);
+
+		this.initMap();
+	}
+
+	initMap() {
+		this.map = new google.maps.Map(document.getElementById(this.mapElementId), {
+			mapId: "6cd56b6d055b9278",
+			center: {
+				lat: 39.4827,
+				lng: -87.3240,
+			},
+			zoom: 15,
+		});
+
+		// Enable Places API Autocomplete
+		this.initAutocomplete();
+	}
+
+	initAutocomplete() {
+		// Enable Places API Autocomplete on starting and destination input fields
+		const startingLocationInput = document.getElementById("startingLocation");
+		const destinationLocationInput = document.getElementById("destinationLocation");
+
+		const autocompleteOptions = {
+			types: ["establishment", "geocode"],
+		};
+
+		const startingLocationAutocomplete = new google.maps.places.Autocomplete(
+			startingLocationInput,
+			autocompleteOptions
+		);
+
+		const destinationLocationAutocomplete = new google.maps.places.Autocomplete(
+			destinationLocationInput,
+			autocompleteOptions
+		);
+
+		// Add event listeners for place_changed event on Autocomplete
+		//The place_changed event means you clicked something from the autocomplete dropdown
+		startingLocationAutocomplete.addListener("place_changed", () => {
+			const place = startingLocationAutocomplete.getPlace();
+			if (place.geometry) {
+				addMarkerFromAutocomplete(place);
 			}
+		});
 
-			img.src = URL.createObjectURL(this.files[0]); // set src to blob url
-
-			//write code here to set the firebase database information
-		}
-	});
-});
-
-
-
-//----------------------------- Google Maps API -----------------------------
-let map;
-let markers = [];
-let directionsService;
-let directionsRenderer;
-
-// const startingLocationInput = document.getElementById("startingLocation");
-// const destinationLocationInput = document.getElementById("destinationLocation");
-
-// startingLocationInput.addEventListener("blur", () => addMarkerFromForm("startingLocation"));
-// destinationLocationInput.addEventListener("blur", () => addMarkerFromForm("destinationLocation"));
-
-function initMap() {
-	map = new google.maps.Map(document.getElementById("map"), {
-		mapId: "6cd56b6d055b9278",
-		center: {
-			lat: 39.4827,
-			lng: -87.3240
-		},
-		zoom: 15,
-	});
-
-	directionsService = new google.maps.DirectionsService();
-	directionsRenderer = new google.maps.DirectionsRenderer();
-	directionsRenderer.setMap(map);
-
-	// Enable Places API Autocomplete on starting and destination input fields
-	const startingLocationInput = document.getElementById("startingLocation");
-	const destinationLocationInput = document.getElementById("destinationLocation");
-
-	const autocompleteOptions = {
-		types: ["geocode"],
-	};
-
-	const startingLocationAutocomplete = new google.maps.places.Autocomplete(
-		startingLocationInput,
-		autocompleteOptions
-	);
-
-	const destinationLocationAutocomplete = new google.maps.places.Autocomplete(
-		destinationLocationInput,
-		autocompleteOptions
-	);
-
-	// Add event listeners for place_changed event on Autocomplete
-	//The place_changed event means you clicked something from the autocomplete dropdown
-	startingLocationAutocomplete.addListener("place_changed", () => {
-		const place = startingLocationAutocomplete.getPlace();
-		if (place.geometry) {
-			addMarkerFromAutocomplete(place);
-		}
-	});
-
-	destinationLocationAutocomplete.addListener("place_changed", () => {
-		const place = destinationLocationAutocomplete.getPlace();
-		if (place.geometry) {
-			addMarkerFromAutocomplete(place);
-		}
-	});
-}
-
-function addMarkerFromForm(inputId) {
-	const input = document.getElementById(inputId).value;
-	geocodeAddress(input);
-}
-
-//in the case of autocomplete, there's no need to read from the html IDs (startingLocation and 
-//destinationLocation because the getPlace() method takes care of that
-function addMarkerFromAutocomplete(place) {
-	console.log(place);
-	geocodeAddress(place);
-}
-
-function geocodeAddress(location) {
-	const geocoder = new google.maps.Geocoder();
-	geocoder.geocode({
-		address: location
-	}, (results, status) => {
-		if (status === "OK") {
-			const latitude = results[0].geometry.location.lat();
-			const longitude = results[0].geometry.location.lng();
-			const latLng = {
-				lat: latitude,
-				lng: longitude
-			};
-			addMarker(latLng);
-		} else {
-			console.log("Geocode was not successful for the following reason: " + status);
-			return;
-		}
-	});
-}
-
-function addMarker(latLng) {
-	const marker = new google.maps.Marker({
-		position: latLng,
-		map: map,
-	});
-	markers.push(marker);
-
-	// Create a LatLngBounds object to encompass all markers
-	const bounds = new google.maps.LatLngBounds();
-	for (const marker of markers) {
-		bounds.extend(marker.getPosition());
-	}
-	map.setZoom(15);
-
-	// Fit the map's viewport to the bounds of all markers
-	map.fitBounds(bounds);
-
-	if (markers.length === 1) {
-		map.setZoom(17);
+		destinationLocationAutocomplete.addListener("place_changed", () => {
+			const place = destinationLocationAutocomplete.getPlace();
+			if (place.geometry) {
+				addMarkerFromAutocomplete(place);
+			}
+		});
 	}
 
-	// Check if both starting point and destination markers are present
-	if (markers.length === 2) {
-		calculateAndDisplayRoute();
+	addMarkerFromForm(inputId) {
+		// ... (same as before)
+		const input = document.getElementById(inputId).value;
+		geocodeAddress(input);
+	}
+
+	addMarkerFromAutocomplete(place) {
+		console.log(place);
+		geocodeAddress(place.formatted_address);
+	}
+
+	geocodeAddress(location) {
+		const geocoder = new google.maps.Geocoder();
+		geocoder.geocode({
+			address: location
+		}, (results, status) => {
+			if (status === "OK") {
+				const latitude = results[0].geometry.location.lat();
+				const longitude = results[0].geometry.location.lng();
+				const latLng = {
+					lat: latitude,
+					lng: longitude
+				};
+				addMarker(latLng);
+			} else {
+				console.log("Geocode was not successful for the following reason: " + status);
+				return;
+			}
+		});
+	}
+
+	addMarker(latLng) {
+		const marker = new google.maps.Marker({
+			position: latLng,
+			map: map,
+		});
+		markers.push(marker);
+
+		// Create a LatLngBounds object to encompass all markers
+		const bounds = new google.maps.LatLngBounds();
+		for (const marker of markers) {
+			bounds.extend(marker.getPosition());
+		}
+		map.setZoom(15);
+
+		// Fit the map's viewport to the bounds of all markers
+		map.fitBounds(bounds);
+
+		if (markers.length === 1) {
+			map.setZoom(17);
+		}
+
+		// Check if both starting point and destination markers are present
+		if (markers.length === 2) {
+			calculateAndDisplayRoute();
+		}
+	}
+
+	calculateAndDisplayRoute() {
+		const startMarker = markers[0];
+		const destinationMarker = markers[1];
+
+		const request = {
+			origin: startMarker.getPosition(),
+			destination: destinationMarker.getPosition(),
+			travelMode: google.maps.TravelMode.DRIVING,
+		};
+
+		// Call the Directions Service to get the route
+		directionsService.route(request, (result, status) => {
+			if (status === "OK") {
+				// Display the route on the map using Directions Renderer
+				directionsRenderer.setDirections(result);
+				const googleMapsURL = `https://www.google.com/maps/dir/?api=1&origin=${startMarker.getPosition().lat()},${startMarker.getPosition().lng()}&destination=${destinationMarker.getPosition().lat()},${destinationMarker.getPosition().lng()}&travelmode=driving`;
+				console.log("Google Maps URL:", googleMapsURL);
+			} else {
+				console.log("Directions request failed due to " + status);
+			}
+		});
+		//Potential TODO: When another address is input (when the form is changed), a third marker is created, maybe figure out a way to remove current 
+		//markers when the address is changed so there are only two markers in the array
 	}
 }
-
-function calculateAndDisplayRoute() {
-	const startMarker = markers[0];
-	const destinationMarker = markers[1];
-
-	const request = {
-		origin: startMarker.getPosition(),
-		destination: destinationMarker.getPosition(),
-		travelMode: google.maps.TravelMode.DRIVING,
-	};
-
-	// Call the Directions Service to get the route
-	directionsService.route(request, (result, status) => {
-		if (status === "OK") {
-			// Display the route on the map using Directions Renderer
-			directionsRenderer.setDirections(result);
-		} else {
-			console.log("Directions request failed due to " + status);
-		}
-	});
-	//Potential TODO: When another address is input (when the form is changed), a third marker is created, maybe figure out a way to remove current 
-	//markers when the address is changed so there are only two markers in the array
-}
-
-
-window.initMap = initMap;
-
-
-
-
 
 /* Main */
 /** function and class syntax examples */
@@ -1627,17 +1582,9 @@ rhit.main = function () {
 	console.log("Ready");
 
 	rhit.fbAuthManager = new rhit.FbAuthManager();
-	// rhit.fbAuthManager.beginListening(() => {
-	// 	console.log("auth change callback fired. TODO: check for redirects and init the page");
-	// 	console.log("isSignedIn = ", rhit.fbAuthManager.isSignedIn);
-	// 	rhit.checkForRedirects();
-
-	// 	rhit.initializePage();
-	// });
 
 	const authAndDataChangeCallback = () => {
 		rhit.fbUsersManager = new rhit.FbUsersManager();
-		console.log("auth change callback fired. TODO: check for redirects and init the page");
 		console.log("isSignedIn = ", rhit.fbAuthManager.isSignedIn);
 
 		// Check for redirects and initialize the page
@@ -1645,9 +1592,7 @@ rhit.main = function () {
 		rhit.initializePage();
 	};
 
-	// Begin listening on both managers
 	rhit.fbAuthManager.beginListening(authAndDataChangeCallback);
-	// rhit.fbUsersManager.beginListening(authAndDataChangeCallback);
 };
 
 rhit.main();
