@@ -272,6 +272,7 @@ rhit.OffersPageController = class {
 rhit.OfferDetailPageController = class {
 	constructor() {
 		rhit.fbSingleOfferManager.beginListening(this.updateView.bind(this));
+		rhit.fbUsersManager.stopListening();
 		rhit.fbUsersManager.beginListening(this.updateList.bind(this));
 	}
 
@@ -281,6 +282,10 @@ rhit.OfferDetailPageController = class {
 			const rider = await rhit.fbUsersManager.getUserByID(riderID);
 			document.querySelector("#riderList").appendChild(this._createRider(rider));
 		}
+		if (rhit.fbSingleOfferManager.seats - rhit.fbSingleOfferManager.riders.length > 0) {
+			document.querySelector("#riderList").innerHTML += `<div>${rhit.fbSingleOfferManager.seats - rhit.fbSingleOfferManager.riders.length} seats left</div>`;
+		}
+
 	}
 
 	_createRider(rider) {
@@ -312,6 +317,18 @@ rhit.OfferDetailPageController = class {
 			button.innerHTML = "Join Ride";
 			button.onclick = (event) => {
 				//add cur user as rider
+				rhit.fbSingleOfferManager.addRider(rhit.fbAuthManager.uid);
+			}
+		}
+		for (const rider of rhit.fbSingleOfferManager.riders) {
+			if (rider == rhit.fbAuthManager.uid) {
+				const button = document.querySelector("#detailActionButton");
+				button.innerHTML = "Leave Ride";
+				button.onclick = (event) => {
+					//remove cur user as rider
+					rhit.fbSingleOfferManager.removeRider(rhit.fbAuthManager.uid);
+				}
+				break;
 			}
 		}
 		this._ref = await firebase.firestore().collection(rhit.FB_COLLECTION_USERS).doc(rhit.fbSingleOfferManager.driver).get()
@@ -1191,6 +1208,40 @@ rhit.FbSingleOfferManager = class {
 			});
 	}
 
+	addRider(newRider) {
+		this._ref.get().then((doc) => {
+			const currentRiders = doc.data().riders || [];
+			currentRiders.push(newRider);
+			this._ref.update({
+				["riders"]: currentRiders,
+			})
+			.then(() => {
+				console.log("Document successfully updated");
+				window.location.href = `/offerDetails.html?id=${this._id}`;
+			})
+			.catch(function (error) {
+				console.log("Error updating document: ", error);
+			});
+		})
+	}
+
+	removeRider(rider) {
+		this._ref.get().then((doc) => {
+			const currentRiders = doc.data().riders || [];
+			currentRiders.splice(currentRiders.indexOf(rider), 1);
+			this._ref.update({
+				["riders"]: currentRiders,
+			})
+			.then(() => {
+				console.log("Document successfully updated");
+				window.location.href = `/offerDetails.html?id=${this._id}`;
+			})
+			.catch(function (error) {
+				console.log("Error updating document: ", error);
+			});
+		})
+	}
+
 	delete() {
 		return this._ref.delete();
 	}
@@ -1220,6 +1271,11 @@ rhit.FbSingleOfferManager = class {
 	get price() {
 		return this._documentSnapshot.get("price");
 	}
+
+	get seats() {
+		return this._documentSnapshot.get("seats");
+	}
+
 	get riders() {
 		return this._documentSnapshot.get("riders");
 	}
