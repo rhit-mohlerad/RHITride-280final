@@ -684,8 +684,8 @@ rhit.CreateRequestPageController = class {
 		const startingLocationInput = document.getElementById("startingLocation");
 		const destinationLocationInput = document.getElementById("destinationLocation");
 
-		startingLocationInput.addEventListener("blur", () => addMarkerFromForm("startingLocation"));
-		destinationLocationInput.addEventListener("blur", () => addMarkerFromForm("destinationLocation"));
+		// startingLocationInput.addEventListener("blur", () => rhit.mapAPIManager.addMarkerFromForm("startingLocation"));
+		// destinationLocationInput.addEventListener("blur", () => rhit.mapAPIManager.addMarkerFromForm("destinationLocation"));
 	}
 }
 
@@ -1437,23 +1437,8 @@ rhit.MapAPIManager = class {
 		this.directionsRenderer.setOptions({
 			suppressMarkers: true
 		});
-		this.directionsRenderer.setMap(this.map);
 
 		this.initMap();
-	}
-
-	initMap() {
-		this.map = new google.maps.Map(document.getElementById(this.mapElementId), {
-			mapId: "6cd56b6d055b9278",
-			center: {
-				lat: 39.4827,
-				lng: -87.3240,
-			},
-			zoom: 15,
-		});
-
-		// Enable Places API Autocomplete
-		this.initAutocomplete();
 	}
 
 	initAutocomplete() {
@@ -1480,30 +1465,40 @@ rhit.MapAPIManager = class {
 		startingLocationAutocomplete.addListener("place_changed", () => {
 			const place = startingLocationAutocomplete.getPlace();
 			if (place.geometry) {
-				addMarkerFromAutocomplete(place);
+				this.addMarkerFromAutocomplete(place, "startingLocation");
 			}
 		});
 
 		destinationLocationAutocomplete.addListener("place_changed", () => {
 			const place = destinationLocationAutocomplete.getPlace();
 			if (place.geometry) {
-				addMarkerFromAutocomplete(place);
+				this.addMarkerFromAutocomplete(place, "destinationLocation");
 			}
 		});
 	}
 
-	addMarkerFromForm(inputId) {
-		// ... (same as before)
-		const input = document.getElementById(inputId).value;
-		geocodeAddress(input);
+	initMap() {
+		this.map = new google.maps.Map(document.getElementById(this.mapElementId), {
+			mapId: "6cd56b6d055b9278",
+			center: {
+				lat: 39.4827,
+				lng: -87.3240,
+			},
+			zoom: 15,
+		});
+
+		this.directionsRenderer.setMap(this.map);
+
+		// Enable Places API Autocomplete
+		this.initAutocomplete();
 	}
 
-	addMarkerFromAutocomplete(place) {
+	addMarkerFromAutocomplete(place, inputId) {
 		console.log(place);
-		geocodeAddress(place.formatted_address);
+		this.geocodeAddress(place.formatted_address, inputId);
 	}
-
-	geocodeAddress(location) {
+	
+	geocodeAddress(location, inputId) {
 		const geocoder = new google.maps.Geocoder();
 		geocoder.geocode({
 			address: location
@@ -1515,7 +1510,7 @@ rhit.MapAPIManager = class {
 					lat: latitude,
 					lng: longitude
 				};
-				addMarker(latLng);
+				this.addMarker(latLng, inputId);
 			} else {
 				console.log("Geocode was not successful for the following reason: " + status);
 				return;
@@ -1523,36 +1518,40 @@ rhit.MapAPIManager = class {
 		});
 	}
 
-	addMarker(latLng) {
+	addMarker(latLng, inputId) {
+		// Remove existing markers from the input
+		this.markers = this.markers.filter(marker => marker.inputId !== inputId);
+	
 		const marker = new google.maps.Marker({
 			position: latLng,
-			map: map,
+			map: this.map,
+			inputId: inputId, // Store the input ID with the marker
 		});
-		markers.push(marker);
+		this.markers.push(marker);
 
 		// Create a LatLngBounds object to encompass all markers
 		const bounds = new google.maps.LatLngBounds();
-		for (const marker of markers) {
+		for (const marker of this.markers) {
 			bounds.extend(marker.getPosition());
 		}
-		map.setZoom(15);
+		this.map.setZoom(15);
 
 		// Fit the map's viewport to the bounds of all markers
-		map.fitBounds(bounds);
+		this.map.fitBounds(bounds);
 
-		if (markers.length === 1) {
-			map.setZoom(17);
+		if (this.markers.length === 1) {
+			this.map.setZoom(17);
 		}
 
 		// Check if both starting point and destination markers are present
-		if (markers.length === 2) {
-			calculateAndDisplayRoute();
+		if (this.markers.length === 2) {
+			this.calculateAndDisplayRoute();
 		}
 	}
 
 	calculateAndDisplayRoute() {
-		const startMarker = markers[0];
-		const destinationMarker = markers[1];
+		const startMarker = this.markers[0];
+		const destinationMarker = this.markers[1];
 
 		const request = {
 			origin: startMarker.getPosition(),
@@ -1561,10 +1560,10 @@ rhit.MapAPIManager = class {
 		};
 
 		// Call the Directions Service to get the route
-		directionsService.route(request, (result, status) => {
+		this.directionsService.route(request, (result, status) => {
 			if (status === "OK") {
 				// Display the route on the map using Directions Renderer
-				directionsRenderer.setDirections(result);
+				this.directionsRenderer.setDirections(result);
 				const googleMapsURL = `https://www.google.com/maps/dir/?api=1&origin=${startMarker.getPosition().lat()},${startMarker.getPosition().lng()}&destination=${destinationMarker.getPosition().lat()},${destinationMarker.getPosition().lng()}&travelmode=driving`;
 				console.log("Google Maps URL:", googleMapsURL);
 			} else {
