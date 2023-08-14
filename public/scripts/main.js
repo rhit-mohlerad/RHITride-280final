@@ -810,8 +810,9 @@ rhit.RequestDetailPageController = class {
 				const comment = ""; // figure out later
 				const seats = 5; //figure out later
 				const riders = [rhit.fbSingleRequestManager.requester];
-				console.log(driver, startTime, endTime, price, start, dest, riders);
-				rhit.fbOffersManager.add(driver, startTime, endTime, price, start, dest, comment, seats, riders);
+				const tripURL = rhit.fbSingleRequestManager.tripURL;
+				console.log(driver, startTime, endTime, price, start, dest, riders, tripURL);
+				rhit.fbOffersManager.add(driver, startTime, endTime, price, start, dest, comment, seats, riders, tripURL);
 				rhit.fbSingleRequestManager.delete().then(() => {
 					console.log("Document successfully deleted!");
 				}).catch((error) => {
