@@ -110,6 +110,8 @@ rhit.RequestsPageController = class {
 		const _requester = this._ref.data();
 		this.tripInfo = "Drop-Off Only";
 		this.returnTime = "";
+		this.fromText = request.start.substring(0, request.start.indexOf(","));
+		this.toText = request.dest.substring(0, request.dest.indexOf(","));
 		//this gets the Timestamp() from firebase and converts it to a formatted JS date.
 		this.startTime = request.startTime.toDate().toLocaleDateString('en-us', {
 			weekday: "long",
@@ -142,8 +144,8 @@ rhit.RequestsPageController = class {
 			  <div class="ride-type">${this.tripInfo}</div>
 			  </div>
 			  <div class="card-locations">
-				<h6 class="text-muted card-from">From: ${request.start}</h6>
-				<h6 class="text-muted card-to">To: ${request.dest}</h6>
+				<h6 class="text-muted card-from">From: ${this.fromText}</h6>
+				<h6 class="text-muted card-to">To: ${this.toText}</h6>
 			  </div>
 			  <div class="bottom-row row">
 				<div class="card-times">
@@ -191,6 +193,8 @@ rhit.OffersPageController = class {
 		this._ref = await firebase.firestore().collection(rhit.FB_COLLECTION_USERS).doc(offer.driver).get()
 		const _driver = this._ref.data();
 		this.returnTime = "";
+		this.fromText = offer.start.substring(0, offer.start.indexOf(","));
+		this.toText = offer.dest.substring(0, offer.dest.indexOf(","));
 		this.startTime = offer.startTime.toDate().toLocaleDateString('en-us', {
 			weekday: "long",
 			month: "long",
@@ -219,8 +223,8 @@ rhit.OffersPageController = class {
 				  <div class="card-seats-available">${offer.seats - offer.riders.length} seats available</div>
 				  </div>
 				  <div class="card-locations">
-					<h6 class="text-muted card-from">From: ${offer.start}</h6>
-					<h6 class="text-muted card-to">To: ${offer.dest}</h6>
+					<h6 class="text-muted card-from">From: ${this.fromText}</h6>
+					<h6 class="text-muted card-to">To: ${this.toText}</h6>
 				  </div>
 				  <div class="bottom-row row">
 					<div class="card-times">
@@ -286,6 +290,12 @@ rhit.OfferDetailPageController = class {
 	}
 
 	async updateView() {
+		document.querySelector("#mapButton").onclick = (event) => {
+			window.open(
+				rhit.fbSingleOfferManager.tripURL,
+				'_blank' // <- This is what makes it open in a new window.
+			);
+		}
 		if (rhit.fbSingleOfferManager.driver == rhit.fbAuthManager.uid) {
 			document.querySelector("#detailDropdown").style.display = "block";
 			document.querySelector("#editButton").onclick = (event) => {
@@ -322,10 +332,12 @@ rhit.OfferDetailPageController = class {
 		}
 		this._ref = await firebase.firestore().collection(rhit.FB_COLLECTION_USERS).doc(rhit.fbSingleOfferManager.driver).get()
 		const _driver = this._ref.data();
+		const fromText = rhit.fbSingleOfferManager.start.substring(0, rhit.fbSingleOfferManager.start.indexOf(","));
+		const toText = rhit.fbSingleOfferManager.dest.substring(0, rhit.fbSingleOfferManager.dest.indexOf(","));
 		document.querySelector(".detail-username").innerHTML = `${_driver.displayName} is offering a ride!`;
 		document.querySelector(".detail-pfp").src = _driver.profilePic;
-		document.querySelector(".detail-from").innerHTML = `From: ${rhit.fbSingleOfferManager.start}`;
-		document.querySelector(".detail-to").innerHTML = `To: ${rhit.fbSingleOfferManager.dest}`;
+		document.querySelector(".detail-from").innerHTML = `From: ${fromText}`;
+		document.querySelector(".detail-to").innerHTML = `To: ${toText}`;
 		document.querySelector(".detail-departure").innerHTML = `Departure Time: ${rhit.fbSingleOfferManager.startTime.toDate().toLocaleDateString('en-us', {
 				weekday: "long",
 				month: "long",
@@ -520,9 +532,10 @@ rhit.ProfileEditPageController = class {
 		const cropButton = document.getElementById("cropButton");
 		//instantiate cropper instance variable for later
 		let cropperInstance = null;
+		let file;
 		//When we upload a file, this will trigger
 		inputFile.addEventListener("change", async (event) => {
-			const file = event.target.files[0];
+			file = event.target.files[0];
 			if (file) {
 				try {
 					const storageRef = firebase.storage().ref();
@@ -557,7 +570,7 @@ rhit.ProfileEditPageController = class {
 			const croppedImageData = cropperInstance.getCroppedCanvas().toBlob(async (blob) => {
 				// upload the croppedImageData to Firebase Storage
 				const storageRef = firebase.storage().ref();
-				const fileRef = storageRef.child("profileImages/" + inputFile.name);
+				const fileRef = storageRef.child("profileImages/" + file.name);
 				const snapshot = await fileRef.put(blob);
 
 				// Get the download URL
@@ -655,7 +668,7 @@ rhit.CreateRequestPageController = class {
 				const start = document.querySelector("#startingLocation").value;
 				const dest = document.querySelector("#destinationLocation").value;
 				const comment = document.querySelector("#additionalComments").value;
-				rhit.fbSingleRequestManager.update(startTime, endTime, payment, start, dest, comment);
+				rhit.fbSingleRequestManager.update(startTime, endTime, payment, start, dest, comment, rhit.mapAPIManager.tripURL);
 			}
 		} else {
 			document.querySelector("#submitButton").onclick = (event) => {
@@ -669,7 +682,7 @@ rhit.CreateRequestPageController = class {
 				const start = document.querySelector("#startingLocation").value;
 				const dest = document.querySelector("#destinationLocation").value;
 				const comment = document.querySelector("#additionalComments").value;
-				rhit.fbRequestsManager.add(requester, startTime, endTime, payment, start, dest, comment);
+				rhit.fbRequestsManager.add(requester, startTime, endTime, payment, start, dest, comment, rhit.mapAPIManager.tripURL);
 			}
 		}
 		document.querySelector("#roundTripCheck").onclick = (event) => {
@@ -681,8 +694,8 @@ rhit.CreateRequestPageController = class {
 				document.querySelector("#returnTime").disabled = true;
 			}
 		}
-		const startingLocationInput = document.getElementById("startingLocation");
-		const destinationLocationInput = document.getElementById("destinationLocation");
+		// const startingLocationInput = document.getElementById("startingLocation");
+		// const destinationLocationInput = document.getElementById("destinationLocation");
 
 		// startingLocationInput.addEventListener("blur", () => rhit.mapAPIManager.addMarkerFromForm("startingLocation"));
 		// destinationLocationInput.addEventListener("blur", () => rhit.mapAPIManager.addMarkerFromForm("destinationLocation"));
@@ -718,7 +731,7 @@ rhit.CreateOfferPageController = class {
 				const dest = document.querySelector("#destinationLocation").value;
 				const comment = document.querySelector("#additionalComments").value;
 				const seats = 5; // placeholder values
-				rhit.fbSingleOfferManager.update(startTime, endTime, price, start, dest, comment, seats, rhit.fbSingleOfferManager.riders);
+				rhit.fbSingleOfferManager.update(startTime, endTime, price, start, dest, comment, seats, rhit.fbSingleOfferManager.riders, rhit.mapAPIManager.tripURL);
 			}
 		} else {
 			document.querySelector("#submitButton").onclick = (event) => {
@@ -734,7 +747,7 @@ rhit.CreateOfferPageController = class {
 				const comment = document.querySelector("#additionalComments").value;
 				const seats = parseInt(document.querySelector("#seatsInput").value); // placeholder values
 				const riders = 0;
-				rhit.fbOffersManager.add(driver, startTime, endTime, price, start, dest, comment, seats);
+				rhit.fbOffersManager.add(driver, startTime, endTime, price, start, dest, comment, seats, [], rhit.mapAPIManager.tripURL);
 			}
 		}
 		document.querySelector("#roundTripCheck").onclick = (event) => {
@@ -746,11 +759,11 @@ rhit.CreateOfferPageController = class {
 				document.querySelector("#returnTime").disabled = true;
 			}
 		}
-		const startingLocationInput = document.getElementById("startingLocation");
-		const destinationLocationInput = document.getElementById("destinationLocation");
+		// const startingLocationInput = document.getElementById("startingLocation");
+		// const destinationLocationInput = document.getElementById("destinationLocation");
 
-		startingLocationInput.addEventListener("blur", () => addMarkerFromForm("startingLocation"));
-		destinationLocationInput.addEventListener("blur", () => addMarkerFromForm("destinationLocation"));
+		// startingLocationInput.addEventListener("blur", () => addMarkerFromForm("startingLocation"));
+		// destinationLocationInput.addEventListener("blur", () => addMarkerFromForm("destinationLocation"));
 	}
 }
 
@@ -761,6 +774,14 @@ rhit.RequestDetailPageController = class {
 	}
 
 	async updateView() {
+
+		document.querySelector("#mapButton").onclick = (event) => {
+			window.open(
+				rhit.fbSingleRequestManager.tripURL,
+				'_blank' // <- This is what makes it open in a new window.
+			);
+		}
+
 		if (rhit.fbSingleRequestManager.requester == rhit.fbAuthManager.uid) {
 			document.querySelector("#detailDropdown").style.display = "block";
 			document.querySelector("#editButton").onclick = (event) => {
@@ -800,10 +821,12 @@ rhit.RequestDetailPageController = class {
 		}
 		this._ref = await firebase.firestore().collection(rhit.FB_COLLECTION_USERS).doc(rhit.fbSingleRequestManager.requester).get()
 		const _requester = this._ref.data();
+		const fromText = rhit.fbSingleRequestManager.start.substring(0, rhit.fbSingleRequestManager.start.indexOf(","));
+		const toText = rhit.fbSingleRequestManager.dest.substring(0, rhit.fbSingleRequestManager.dest.indexOf(","));
 		document.querySelector(".detail-username").innerHTML = `${_requester.displayName} is requesting a ride!`;
 		document.querySelector(".detail-pfp").src = _requester.profilePic;
-		document.querySelector(".detail-from").innerHTML = `From: ${rhit.fbSingleRequestManager.start}`;
-		document.querySelector(".detail-to").innerHTML = `To: ${rhit.fbSingleRequestManager.dest}`;
+		document.querySelector(".detail-from").innerHTML = `From: ${fromText}`;
+		document.querySelector(".detail-to").innerHTML = `To: ${toText}`;
 		document.querySelector(".detail-departure").innerHTML = `Departure Time: ${rhit.fbSingleRequestManager.startTime.toDate().toLocaleDateString('en-us', {
 				weekday: "long",
 				month: "long",
@@ -834,7 +857,7 @@ rhit.FbRequestsManager = class {
 		this._ref = firebase.firestore().collection(rhit.FB_COLLECTION_REQUESTS);
 		this._unsubscribe = null;
 	}
-	add(requester, startTime, endTime, payment, start, dest, comment) {
+	add(requester, startTime, endTime, payment, start, dest, comment, tripURL) {
 		this._ref.add({
 				["requester"]: requester,
 				["startTime"]: startTime,
@@ -843,6 +866,7 @@ rhit.FbRequestsManager = class {
 				["start"]: start,
 				["dest"]: dest,
 				["comment"]: comment,
+				["tripURL"]: tripURL,
 
 			})
 			.then(function (docRef) {
@@ -1045,7 +1069,7 @@ rhit.FbSingleRequestManager = class {
 		});
 	}
 
-	update(startTime, endTime, payment, start, dest, comment) {
+	update(startTime, endTime, payment, start, dest, comment, tripURL) {
 		this._ref.update({
 				["startTime"]: startTime,
 				["endTime"]: endTime,
@@ -1053,6 +1077,7 @@ rhit.FbSingleRequestManager = class {
 				["start"]: start,
 				["dest"]: dest,
 				["comment"]: comment,
+				["tripURL"]: tripURL
 			})
 			.then(() => {
 				console.log("Document successfully updated");
@@ -1092,6 +1117,9 @@ rhit.FbSingleRequestManager = class {
 	get payment() {
 		return this._documentSnapshot.get("payment");
 	}
+	get tripURL() {
+		return this._documentSnapshot.get("tripURL");
+	}
 }
 
 rhit.FbOffersManager = class {
@@ -1102,7 +1130,7 @@ rhit.FbOffersManager = class {
 		this._ref = firebase.firestore().collection(rhit.FB_COLLECTION_OFFERS);
 		this._unsubscribe = null;
 	}
-	add(driver, startTime, endTime, price, start, dest, comment, seats, riders = []) {
+	add(driver, startTime, endTime, price, start, dest, comment, seats, riders = [], tripURL) {
 		this._ref.add({
 				["driver"]: driver,
 				["startTime"]: startTime,
@@ -1113,6 +1141,7 @@ rhit.FbOffersManager = class {
 				["comment"]: comment,
 				["seats"]: seats,
 				["riders"]: riders,
+				["tripURL"]: tripURL,
 
 			})
 			.then(function (docRef) {
@@ -1176,7 +1205,7 @@ rhit.FbSingleOfferManager = class {
 		});
 	}
 
-	update(startTime, endTime, price, start, dest, comment, seats, riders) {
+	update(startTime, endTime, price, start, dest, comment, seats, riders, tripURL) {
 		this._ref.update({
 				["startTime"]: startTime,
 				["endTime"]: endTime,
@@ -1186,6 +1215,7 @@ rhit.FbSingleOfferManager = class {
 				["comment"]: comment,
 				["seats"]: seats,
 				["riders"]: riders,
+				["tripURL"]: tripURL,
 			})
 			.then(() => {
 				console.log("Document successfully updated");
@@ -1266,6 +1296,10 @@ rhit.FbSingleOfferManager = class {
 
 	get riders() {
 		return this._documentSnapshot.get("riders");
+	}
+
+	get tripURL() {
+		return this._documentSnapshot.get("tripURL");
 	}
 }
 
@@ -1431,6 +1465,7 @@ rhit.MapAPIManager = class {
 	constructor() {
 		this.mapElementId = "map";
 		this.map = null;
+		this.tripURL = null;
 		this.markers = [];
 		this.directionsService = new google.maps.DirectionsService();
 		this.directionsRenderer = new google.maps.DirectionsRenderer();
@@ -1497,7 +1532,7 @@ rhit.MapAPIManager = class {
 		console.log(place);
 		this.geocodeAddress(place.formatted_address, inputId);
 	}
-	
+
 	geocodeAddress(location, inputId) {
 		const geocoder = new google.maps.Geocoder();
 		geocoder.geocode({
@@ -1521,7 +1556,7 @@ rhit.MapAPIManager = class {
 	addMarker(latLng, inputId) {
 		// Remove existing markers from the input
 		this.markers = this.markers.filter(marker => marker.inputId !== inputId);
-	
+
 		const marker = new google.maps.Marker({
 			position: latLng,
 			map: this.map,
@@ -1566,6 +1601,7 @@ rhit.MapAPIManager = class {
 				this.directionsRenderer.setDirections(result);
 				const googleMapsURL = `https://www.google.com/maps/dir/?api=1&origin=${startMarker.getPosition().lat()},${startMarker.getPosition().lng()}&destination=${destinationMarker.getPosition().lat()},${destinationMarker.getPosition().lng()}&travelmode=driving`;
 				console.log("Google Maps URL:", googleMapsURL);
+				this.tripURL = googleMapsURL;
 			} else {
 				console.log("Directions request failed due to " + status);
 			}
@@ -1573,6 +1609,7 @@ rhit.MapAPIManager = class {
 		//Potential TODO: When another address is input (when the form is changed), a third marker is created, maybe figure out a way to remove current 
 		//markers when the address is changed so there are only two markers in the array
 	}
+
 }
 
 /* Main */
