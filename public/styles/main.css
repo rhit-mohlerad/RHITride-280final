@@ -324,6 +324,11 @@ button>i {
     margin-bottom: 10px;
 }
 
+/* #requestDetailPage {
+    display: flex;
+    justify-content: center;
+} */
+
 .details,
 #requestDetailPage {
     max-width: 100%;
@@ -365,6 +370,7 @@ div.dollar-sign:after {
 
 .detail-locations {
     margin-top: 5px;
+    margin-left: -40px;
 }
 
 .detail-locations h6 {
@@ -453,6 +459,7 @@ div.dollar-sign:after {
 #mapButton {
     max-height: 250px;
     max-width: 90vw;
+    cursor: pointer;
 }
 
 #uploadPhotoLabel {
