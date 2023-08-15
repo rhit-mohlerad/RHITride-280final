@@ -206,6 +206,10 @@ button>i {
     margin: 20px auto;
 }
 
+#profilePage .ride-type, #profilePage .card-seats-available {
+    margin-top: -20px;
+}
+
 .ride-type {
     background-color: lightblue;
     margin-top: -40px;
@@ -572,4 +576,8 @@ div.dollar-sign:after {
     #profilePage h6 {
         font-size: 1.5em;
     }
+
+    /* #profilePage #profileName {
+        font-size: 2.5em;
+    } */
 }
