@@ -120,6 +120,10 @@ body {
     font-weight: 600;
     margin-bottom: 0;
     margin-top: -10px;
+    margin-right: 10px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .card-seats-available,
@@ -546,6 +550,14 @@ div.dollar-sign:after {
     background: #800000;
 }
 
+@media (max-width: 400px) {
+    .card-username {
+        max-width: 150px; /* Set a maximum width */
+        font-size: 1.2em; /* Adjust font size or other properties as needed */
+        white-space: normal;
+        margin-bottom: 15px;
+    }
+}
 
 @media (min-width: 768px) {
     .bottom-nav {
