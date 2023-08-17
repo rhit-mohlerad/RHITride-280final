@@ -334,8 +334,9 @@ rhit.OfferDetailPageController = class {
 		const _driver = this._ref.data();
 		const fromText = rhit.fbSingleOfferManager.start.substring(0, rhit.fbSingleOfferManager.start.indexOf(","));
 		const toText = rhit.fbSingleOfferManager.dest.substring(0, rhit.fbSingleOfferManager.dest.indexOf(","));
-		document.querySelector(".detail-username").innerHTML = `${_driver.displayName} is offering a ride!`;
+		document.querySelector(".detail-username").innerHTML = `${_driver.displayName}`;
 		document.querySelector(".detail-pfp").src = _driver.profilePic;
+		document.querySelector(".detail-profile-link").href = `/profile.html?id=${rhit.fbSingleOfferManager.driver}`;
 		document.querySelector(".detail-from").innerHTML = `From: ${fromText}`;
 		document.querySelector(".detail-to").innerHTML = `To: ${toText}`;
 		document.querySelector(".detail-departure").innerHTML = `Departure Time: ${rhit.fbSingleOfferManager.startTime.toDate().toLocaleDateString('en-us', {
