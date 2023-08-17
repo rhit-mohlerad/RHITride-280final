@@ -254,6 +254,8 @@ button>i {
     margin-left: 0;
 }
 
+
+
 #moneyInput, #seatsInput {
     max-width: 60px;
 }
@@ -425,6 +427,7 @@ div.dollar-sign:after {
 
 .rider {
     margin-bottom: 5px;
+    color: black;
 }
 
 

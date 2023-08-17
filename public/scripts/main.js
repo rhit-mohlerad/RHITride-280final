@@ -273,7 +273,8 @@ rhit.OfferDetailPageController = class {
 		document.querySelector("#riderList").innerHTML = "";
 		for (const riderID of rhit.fbSingleOfferManager.riders) {
 			const rider = await rhit.fbUsersManager.getUserByID(riderID);
-			document.querySelector("#riderList").appendChild(this._createRider(rider));
+			const riderElement = this._createRider(rider);
+			document.querySelector("#riderList").appendChild(riderElement);
 		}
 		if (rhit.fbSingleOfferManager.seats - rhit.fbSingleOfferManager.riders.length > 0) {
 			document.querySelector("#riderList").innerHTML += `<div>${rhit.fbSingleOfferManager.seats - rhit.fbSingleOfferManager.riders.length} seats left</div>`;
@@ -282,11 +283,11 @@ rhit.OfferDetailPageController = class {
 	}
 
 	_createRider(rider) {
-		return htmlToElement(`<div class="rider row">
+		return htmlToElement(`<a href="/profile.html?id=${rider.id}" class="rider row">
 		<img src="${rider.profilePic}"
 	  alt="Profile Picture" class="rider-pfp">
 		<div class="rider-name">${rider.displayName}</div>
-	  </div>`);
+	  </a>`);
 	}
 
 	async updateView() {
