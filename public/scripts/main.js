@@ -381,7 +381,9 @@ rhit.ProfilePageController = class {
 			document.querySelector("#profilePhoneNumber").innerHTML = rhit.fbSingleUserManager.phoneNumber;
 			document.querySelector("#profileCarInfo").innerHTML = `${rhit.fbSingleUserManager.carSeats} seat ${rhit.fbSingleUserManager.car}`;
 		});
-
+		if (rhit.fbSingleUserManager.id != rhit.fbAuthManager.uid) {
+			document.querySelector("#profileDropdown").hidden = true;
+		}
 		document.querySelector("#profileEditButton").onclick = (event) => {
 			window.location.href = `/profileSetup.html?id=${rhit.fbAuthManager.uid}`;
 		}
