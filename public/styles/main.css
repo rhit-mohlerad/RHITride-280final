@@ -561,12 +561,13 @@ div.dollar-sign:after {
     background: #800000;
 }
 
-@media (max-width: 400px) {
+@media (max-width: 500px) {
     .card-username {
-        max-width: 150px; /* Set a maximum width */
-        font-size: 1.2em; /* Adjust font size or other properties as needed */
+        max-width: 50%; /*Set a maximum width*/
+        font-size: 1.1em; /* Adjust font size or other properties as needed */
         white-space: normal;
         margin-bottom: 15px;
+        margin-right: 10px;
     }
 }
 
