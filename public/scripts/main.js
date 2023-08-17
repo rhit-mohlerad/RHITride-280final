@@ -646,6 +646,10 @@ rhit.ProfileEditPageController = class {
 
 rhit.CreateRequestPageController = class {
 	constructor(reqId) {
+		document.querySelector("#startTime").value = moment(new Date()).format('YYYY-MM-DDTHH:mm:ss');
+		document.querySelector("#startTime").min = moment(new Date()).format('YYYY-MM-DDTHH:mm:ss');
+		document.querySelector("#returnTime").value = moment(new Date()).format('YYYY-MM-DDTHH:mm:ss');
+		document.querySelector("#returnTime").min = moment(new Date()).format('YYYY-MM-DDTHH:mm:ss');
 		if (reqId) {
 			rhit.fbSingleRequestManager.beginListening(() => {
 				document.querySelector("#startingLocation").value = rhit.fbSingleRequestManager.start;
@@ -708,6 +712,10 @@ rhit.CreateRequestPageController = class {
 
 rhit.CreateOfferPageController = class {
 	constructor(offerId) {
+		document.querySelector("#startTime").value = moment(new Date()).format('YYYY-MM-DDTHH:mm:ss');
+		document.querySelector("#startTime").min = moment(new Date()).format('YYYY-MM-DDTHH:mm:ss');
+		document.querySelector("#returnTime").value = moment(new Date()).format('YYYY-MM-DDTHH:mm:ss');
+		document.querySelector("#returnTime").min = moment(new Date()).format('YYYY-MM-DDTHH:mm:ss');
 		if (offerId) {
 			rhit.fbSingleOfferManager.beginListening(() => {
 				document.querySelector("#startingLocation").value = rhit.fbSingleOfferManager.start;
