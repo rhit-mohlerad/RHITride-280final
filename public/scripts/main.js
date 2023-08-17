@@ -824,8 +824,9 @@ rhit.RequestDetailPageController = class {
 		const _requester = this._ref.data();
 		const fromText = rhit.fbSingleRequestManager.start.substring(0, rhit.fbSingleRequestManager.start.indexOf(","));
 		const toText = rhit.fbSingleRequestManager.dest.substring(0, rhit.fbSingleRequestManager.dest.indexOf(","));
-		document.querySelector(".detail-username").innerHTML = `${_requester.displayName} is requesting a ride!`;
+		document.querySelector(".detail-username").innerHTML = `${_requester.displayName}`;
 		document.querySelector(".detail-pfp").src = _requester.profilePic;
+		document.querySelector(".detail-profile-link").href = `/profile.html?id=${rhit.fbSingleRequestManager.requester}`;
 		document.querySelector(".detail-from").innerHTML = `From: ${fromText}`;
 		document.querySelector(".detail-to").innerHTML = `To: ${toText}`;
 		document.querySelector(".detail-departure").innerHTML = `Departure Time: ${rhit.fbSingleRequestManager.startTime.toDate().toLocaleDateString('en-us', {
